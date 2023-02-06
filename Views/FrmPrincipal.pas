@@ -10,7 +10,6 @@ uses
 
 type
   TFPrincipal = class(TForm)
-    Image1: TImage;
     MainMenu1: TMainMenu;
     ConversorXml1: TMenuItem;
     SpedFiscal1: TMenuItem;

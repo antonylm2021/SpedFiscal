@@ -2,7 +2,7 @@ object FPrincipal: TFPrincipal
   Left = 0
   Top = 0
   Caption = 'Gerador Lopes Escritura'#231#227'o Fiscal'
-  ClientHeight = 511
+  ClientHeight = 411
   ClientWidth = 642
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -12,14 +12,14 @@ object FPrincipal: TFPrincipal
   Font.Style = []
   Menu = MainMenu1
   OldCreateOrder = False
-  Position = poDesktopCenter
+  Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
   object Image1: TImage
     Left = 0
     Top = 0
     Width = 642
-    Height = 511
+    Height = 411
     Align = alClient
     Picture.Data = {
       0A544A504547496D616765B3250300FFD8FFE000104A46494600010100000100
@@ -6482,9 +6482,27 @@ object FPrincipal: TFPrincipal
       Caption = 'Cadastro B'#225'sico'
       object Empresa1: TMenuItem
         Caption = 'Empresa'
+        OnClick = Empresa1Click
       end
       object Contabilidade1: TMenuItem
         Caption = 'Contabilidade'
+        OnClick = Contabilidade1Click
+      end
+      object ContasContabeis1: TMenuItem
+        Caption = 'Contas Contabeis'
+        OnClick = ContasContabeis1Click
+      end
+      object Centrodecustos1: TMenuItem
+        Caption = 'Centro de Custos'
+        OnClick = Centrodecustos1Click
+      end
+      object BensImobilizados1: TMenuItem
+        Caption = 'Bens Imobilizados'
+        OnClick = BensImobilizados1Click
+      end
+      object LimparTabelas1: TMenuItem
+        Caption = 'Limpar Tabelas'
+        OnClick = LimparTabelas1Click
       end
     end
     object ConversorXml1: TMenuItem
