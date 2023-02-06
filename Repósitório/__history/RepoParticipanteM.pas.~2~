@@ -1,0 +1,41 @@
+unit RepoParticipanteM;
+
+interface
+uses Participante,Uni,classes,System.SysUtils,Vcl.Dialogs,Conexao;
+type
+tRepoParticipante = class (TParticipante)
+private
+var
+conect : tconexao;
+Qry: Tuniquery;
+public
+constructor create;
+function SalvarParticipante(const Participante : TParticipante):boolean;
+function ListarParticipantesPorPeriodo(Dataini,Datafim:TDate):TUniQuery;
+
+end;
+
+implementation
+
+{ tRepoParticipante }
+
+constructor tRepoParticipante.create;
+begin
+
+end;
+
+function tRepoParticipante.ListarParticipantesPorPeriodo(Dataini,
+  Datafim: TDate): TUniQuery;
+begin
+  Conect:= TConexao.create('Local');
+  Qry:= TUniQuery.Create(nil);
+  Qry.Connection:= Conect.Conexao;
+end;
+
+function tRepoParticipante.SalvarParticipante(
+  const Participante: TParticipante): boolean;
+begin
+
+end;
+
+end.

@@ -1,0 +1,138 @@
+unit CentroDecustos;
+
+interface
+
+uses Conexao,Contascontabeis,System.SysUtils,Vcl.Dialogs,Classes,uni;
+
+type TCentroDecusto = class(TContascontabeis)
+
+private
+var
+Conect:TConexao;
+Qry:TUniQuery;
+public
+
+constructor create;override;
+procedure Salvarc(const Conta: TContascontabeis);override;
+procedure Excluirc(Id:Integer);override;
+procedure Editarc(Const Conta:TcontasContabeis;Id:integer);override;
+function Listarc:TUniQuery;override;
+function ListarPorIdc(Id:Integer):TUniQuery;override;
+function ValidarDadosc(Const contas:Tcontascontabeis):Boolean;override;
+end;
+
+
+
+implementation
+
+{ TCentroDecusto }
+
+
+constructor TCentroDecusto.create;
+begin
+  inherited;
+  Conect:= TConexao.create('Local');
+  Qry:= TUniQuery.Create(nil);
+  Qry.Connection:= Conect.Conexao;
+end;
+
+procedure TCentroDecusto.Editarc(const Conta: TcontasContabeis; Id: integer);
+begin
+  if ValidarDadosc(Conta)then
+  begin
+  inherited;
+  Qry.SQL.Clear;
+  Qry.SQL.Add('UPDATE CENTRO_DE_CUSTO SET DT_ALT=:PDT,CCUS=:PCCUS WHERE ID=:PID');
+  Qry.Params.ParamByName('PDT').AsDate:= Now();
+  Qry.Params.ParamByName('PID').AsInteger:= Id;
+  Qry.Params.ParamByName('PNOME').AsString:= Conta.Nome_Cta;
+  try
+    Qry.ExecSQL;
+    ShowMessage('Salvo com sucesso!');
+  except
+    on Erro: Exception do
+    ShowMessage('Erro: '+Erro.Message);
+  end;
+end;
+end;
+
+procedure TCentroDecusto.Excluirc(Id: Integer);
+begin
+  inherited;
+  Qry.SQL.Clear;
+  Qry.SQL.Add('DELETE FROM CENTRO_DE_CUSTO WHERE ID=:PID');
+  Qry.Params.ParamByName('PID').AsInteger:= Id;
+  try
+    Qry.ExecSQL;
+    ShowMessage('Deletado com sucesso!');
+  except
+    on Erro: Exception do
+    ShowMessage('Erro: '+Erro.Message);
+  end;
+end;
+
+
+
+function TCentroDecusto.Listarc: TUniQuery;
+begin
+  inherited;
+  Qry.SQL.Clear;
+  Qry.SQL.Add('SELECT * FROM CENTRO_DE_CUSTO');
+  try
+    Qry.Open;
+    Result:= Qry;
+  except
+    on Erro: Exception do
+    ShowMessage('Erro: '+Erro.Message);
+  end;
+
+end;
+
+function TCentroDecusto.ListarPorIdc(Id: Integer): TUniQuery;
+begin
+  inherited;
+  Qry.SQL.Clear;
+  Qry.SQL.Add('SELECT * FROM CENTRO_DE_CUSTO WHERE ID=:PID');
+  Qry.Params.ParamByName('PID').AsInteger:= Id;
+  try
+    Qry.Open;
+    Result:= Qry;
+  except
+    on Erro: Exception do
+    ShowMessage('Erro: '+Erro.Message);
+  end;
+
+end;
+
+procedure TCentroDecusto.Salvarc(const Conta: TContascontabeis);
+begin
+  inherited;
+  if ValidarDados(Conta) then
+  begin
+  Qry.SQL.Clear;
+  Qry.SQL.Add('INSERT INTO CENTRO_DE_CUSTO(DT_ALT,CCUS)VALUES(:PDT,:PNOME)');
+  Qry.Params.ParamByName('PDT').AsDate:= Now();
+  Qry.Params.ParamByName('PNOME').AsString:= Conta.Nome_Cta;
+  try
+    Qry.ExecSQL;
+    ShowMessage('Salvo com sucesso!');
+  except
+    on Erro: Exception do
+    ShowMessage('Erro: '+Erro.Message);
+  end;
+end;
+end;
+
+
+function TCentroDecusto.ValidarDadosc(const contas: Tcontascontabeis): Boolean;
+begin
+  if contas.Nome_Cta = '' then
+    begin
+      raise Exception.Create('Preencha o nome');
+      Exit;
+    end;
+
+   Result:= True;
+end;
+
+end.

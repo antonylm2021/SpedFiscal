@@ -1,0 +1,86 @@
+unit CadastroEmpresaView;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,Empresa;
+
+type
+  TFrmCadastroEmpresa = class(TForm)
+    LblId: TLabeledEdit;
+    LblRazao: TLabeledEdit;
+    LblFantasia: TLabeledEdit;
+    LblCnpj: TLabeledEdit;
+    LblIe: TLabeledEdit;
+    LblTelefone: TLabeledEdit;
+    LblEndereco: TLabeledEdit;
+    LblNumero: TLabeledEdit;
+    LblBairro: TLabeledEdit;
+    LblCidade: TLabeledEdit;
+    LblUf: TLabeledEdit;
+    Lblemail: TLabeledEdit;
+    Lblcomplemento: TLabeledEdit;
+    Lblibge: TLabeledEdit;
+    Button1: TButton;
+    LblCep: TLabeledEdit;
+    procedure AlimentarDados;
+    procedure SalvarDados;
+    procedure Button1Click(Sender: TObject);
+  private
+    { Private declarations }
+    var
+    Empresa :TEmpresa;
+  public
+    { Public declarations }
+  end;
+
+var
+  FrmCadastroEmpresa: TFrmCadastroEmpresa;
+
+implementation
+
+{$R *.dfm}
+
+{ TFrmCadastroEmpresa }
+
+procedure TFrmCadastroEmpresa.AlimentarDados;
+begin
+  Empresa:= Tempresa.Create;
+  Empresa.LXnome := LblRazao.text;
+  Empresa.LCNPJ:= LblCnpj.text;
+  Empresa.LXlgr:= LblEndereco.text;
+  Empresa.LXcpl:= Lblcomplemento.text;
+  Empresa.LXBairro:= LblBairro.text;
+  Empresa.LCMun:= StrToInt(Lblibge.text);
+  Empresa.LXnum:= LblCidade.text;
+  Empresa.LUf:= LblUf.text;
+  Empresa.LCep:= lblcep.text;
+  Empresa.LcPais:= 33;
+  Empresa.LXPais:= 'Brasil';
+  Empresa.LFone:= LblTelefone.text;
+  if LblNumero ='' then
+    Empresa.LNro:= 0
+    else
+  Empresa.LNro:= StrToInt(LblNumero.text);
+end;
+
+procedure TFrmCadastroEmpresa.Button1Click(Sender: TObject);
+begin
+  AlimentarDados();
+  SalvarDados();
+end;
+
+procedure TFrmCadastroEmpresa.SalvarDados;
+begin
+  try
+  if Empresa.SalvarDadosEmpresa(Empresa) then
+    ShowMessage('Cadastro da empresa Salvo com sucesso!')
+    else
+      ShowMessage('Não foi possível salvar os dados,Verifique os dados ou a conexão com a base de dados.');
+  finally
+     Empresa.Free;
+  end;
+end;
+
+end.

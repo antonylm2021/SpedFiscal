@@ -1,0 +1,165 @@
+unit FrmCadBens;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms,System.StrUtils, Vcl.Dialogs,Contascontabeis, Vcl.StdCtrls,Uni, Vcl.ExtCtrls,Bens,FrmPesquisa;
+
+type
+  TCadBens = class(TForm)
+    lblpatrimonio: TLabeledEdit;
+    Cbident: TComboBox;
+    Label1: TLabel;
+    cbconta: TComboBox;
+    Label2: TLabel;
+    lblDescricao: TLabeledEdit;
+    lblcodprincipal: TLabeledEdit;
+    lblParcelas: TLabeledEdit;
+    Button1: TButton;
+    Button2: TButton;
+    Button3: TButton;
+    lblid: TLabeledEdit;
+    Button4: TButton;
+    procedure Button1Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+  private
+    { Private declarations }
+    procedure PassarDados;
+    procedure LimparForm;
+    procedure ReceberDadosDeContas;
+    procedure Excluir;
+
+  public
+    { Public declarations }
+    procedure ReceberDados(Id:Integer);
+  end;
+
+var
+  CadBens: TCadBens;
+   Bens:TBens;
+   Qry:Tuniquery;
+
+implementation
+
+{$R *.dfm}
+
+{ TCadBens }
+
+procedure TCadBens.Button1Click(Sender: TObject);
+begin
+  PassarDados();
+  LimparForm();
+end;
+
+procedure TCadBens.Button2Click(Sender: TObject);
+begin
+  Excluir();
+end;
+
+procedure TCadBens.Button3Click(Sender: TObject);
+begin
+  LimparForm();
+end;
+
+procedure TCadBens.Excluir;
+begin
+  Bens:= TBens.create();
+  try
+    Bens.Excluirb(StrToInt(lblid.text));
+  finally
+    Bens.Free;
+  end;
+end;
+
+procedure TCadBens.FormShow(Sender: TObject);
+begin
+  ReceberDadosDeContas();
+end;
+
+procedure TCadBens.LimparForm;
+begin
+  lblDescricao.Text:= '';
+  lblpatrimonio.Text:= '';
+  lblParcelas.Text:= '';
+  cbconta.ItemIndex:= 0;
+  lblcodprincipal.Text:= '';
+  Cbident.ItemIndex:= 0;
+end;
+
+
+procedure TCadBens.PassarDados;
+begin
+  Bens:= TBens.create();
+  Bens.Descricao:= lblDescricao.Text;
+  Bens.Patrimonio:= lblpatrimonio.Text;
+  Bens.Parcela:= lblParcelas.Text;
+  Bens.Cod_NAT_CC:=Copy(cbconta.Text,1,3);
+  Bens.Cod_prnc:= lblcodprincipal.Text;
+  Bens.Ind_Cta:= Copy(Cbident.Text,0,1);
+  try
+    if lblid.Text <> '' then
+      Bens.Editarb(Bens,StrToInt(lblid.text))
+    else
+      Bens.Salvarb(Bens);
+  finally
+     Bens.Free;
+  end;
+end;
+
+procedure TCadBens.ReceberDados(Id:Integer);
+begin
+  Qry:= TUniQuery.Create(nil);
+  Qry:= Bens.ListarPorIdb(Id);
+
+  if Not Qry.IsEmpty then
+    try
+      lblid.Text:= Qry.FieldByName('ID').AsString;
+      lblDescricao.Text:= Qry.FieldByName('DESCR_ITEM').AsString;
+      lblpatrimonio.Text:= Qry.FieldByName('COD_IND_BEM').AsString;
+      lblParcelas.Text:= Qry.FieldByName('NR_PARC').AsString;
+      lblcodprincipal.Text:= Qry.FieldByName('COD_PRNC').AsString;
+
+
+      case AnsiIndexStr(Qry.FieldByName('IND_CTA').Asstring,['1','2']) of
+        0: Cbident.ItemIndex:=0;
+        1: Cbident.ItemIndex:=1;
+      end;
+  finally
+    Bens.Free;
+    Qry.Free;
+  end;
+end;
+
+procedure TCadBens.ReceberDadosDeContas;
+var
+Contas: TContascontabeis;
+begin
+  contas:= TContascontabeis.create();
+  Qry:= TUniQuery.Create(nil);
+  Qry:= Contas.Listar();
+
+  if Not Qry.IsEmpty then
+    begin
+    Qry.First;
+    try
+      while Not Qry.Eof do
+        begin
+          cbconta.Items.Add(IntToStr(Qry.FieldByName('ID').AsInteger)+ ':'+
+          Qry.FieldByName('NOME_CTA').AsString);
+          Qry.Next;
+        end;
+    finally
+       Qry.Free;
+       Contas.Free;
+       cbconta.ItemIndex:= 0;
+    end;
+    end;
+
+
+
+end;
+
+end.

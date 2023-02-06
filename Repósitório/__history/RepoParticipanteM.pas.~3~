@@ -1,0 +1,69 @@
+unit RepoParticipanteM;
+
+interface
+uses Participante,Uni,classes,System.SysUtils,Vcl.Dialogs,Conexao;
+type
+tRepoParticipante = class (TParticipante)
+private
+var
+conect : tconexao;
+Qry: Tuniquery;
+public
+constructor create;
+function SalvarParticipante(const Participante : TParticipante):boolean;
+function ListarParticipantesPorPeriodo(Dataini,Datafim:TDate):TUniQuery;
+
+end;
+
+implementation
+
+{ tRepoParticipante }
+
+constructor tRepoParticipante.create;
+begin
+
+end;
+
+function tRepoParticipante.ListarParticipantesPorPeriodo(Dataini,
+  Datafim: TDate): TUniQuery;
+begin
+  Conect:= TConexao.create('Local');
+  Qry:= TUniQuery.Create(nil);
+  Qry.Connection:= Conect.Conexao;
+end;
+
+function tRepoParticipante.SalvarParticipante(
+  const Participante: TParticipante): boolean;
+begin
+    ShowMessage(Participante.lXNome);
+{
+  Qry.SQL.Add('INSERT INTO PARTICIPANTE(CNPJ,XNOME,XLGR,NRO,XCPL,XBAIRRO,CMUN,XMUN,');
+  Qry.SQL.Add('UF,CEP,CPAIS,XPAIS,FONE,INDIEDEST,IE,EMAIL,DATA)');
+  Qry.SQL.Add('VALUES(:pCNPJ,:pXNOME,:pXLGR,:pNRO,:pXCPL,:pXBAIRRO,:pCMUN,:pXMUN,:pUF,');
+  Qry.SQL.Add(':pCEP,:pCPAIS,:pXPAIS,:pFONE,:pINDIEDEST,:pIE,:pEMAIL,:pDATA)');
+  Qry.Params.ParamByName('pCNPJ').AsString := Participante.CNPJ;
+  Qry.Params.ParamByName('pXNOME').AsString:= Participante.XNome;
+  Qry.Params.ParamByName('pXLGR').AsString:= Participante.Xlgr;
+  Qry.Params.ParamByName('pNRO').AsInteger:= Participante.Nro;
+  Qry.Params.ParamByName('pXCPL').AsString:= Participante.Xcpl;
+  Qry.Params.ParamByName('pXBAIRRO').AsString:= Participante.xBairro;
+  Qry.Params.ParamByName('pCMUN').AsInteger:= Participante.CMun;
+  Qry.Params.ParamByName('pXMUN').AsString:= Participante.Xmun;
+  Qry.Params.ParamByName('pUF').AsString:= Participante.Uf;
+  Qry.Params.ParamByName('pCEP').AsString:= Participante.Cep;
+  Qry.Params.ParamByName('pCPAIS').AsInteger:= Participante.cPais;
+  Qry.Params.ParamByName('pXPAIS').AsString:= Participante.XPais;
+  Qry.Params.ParamByName('pFONE').AsString:= Participante.Fone;
+  Qry.Params.ParamByName('pINDIEDEST').AsString:= Participante.Indedest;
+  Qry.Params.ParamByName('pIE').AsString:= Participante.Ie;
+  Qry.Params.ParamByName('pEMAIL').AsString:= Participante.Email;
+  Qry.Params.ParamByName('pDATA').AsDate:= Now;
+  try
+    Qry.Execute;
+    Result:= True;
+  finally
+    Qry.Free;
+  end;
+end;
+
+end.

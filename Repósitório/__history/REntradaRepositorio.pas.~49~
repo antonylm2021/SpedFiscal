@@ -1,0 +1,862 @@
+unit REntradaRepositorio;
+
+interface
+
+uses Conexao,uni,System.SysUtils,classes,Vcl.Dialogs;
+
+type TEntradaRepositorio = class
+
+private
+
+id: Integer;
+Vbc: currency;
+Vicms: currency;
+Vicmsdeson: currency;
+VFcpUfDest: currency;
+VFcp: currency;
+VBcSt: currency;
+VSt: currency;
+VFcpSt: currency;
+VFcpStret: currency;
+VProd: currency;
+VFrete: currency;
+VSeg: currency;
+VDesc: currency;
+Vii: currency;
+VIpi: currency;
+VIpideVol: currency;
+VPis: currency;
+VCofins: currency;
+VOutro: currency;
+VNf: currency;
+VTotTrib: currency;
+CUf: currency;
+CNf: currency;
+NaTop: string;
+Mode: currency;
+Serie: currency;
+Nnf: currency;
+Dhemi: tdate;
+Dhsaient: tdate;
+TpNf: currency;
+IdDest: currency;
+CMunfg: currency;
+TpImp: currency;
+Tpemis: currency;
+Cdv: currency;
+TPamb: currency;
+FinNfe: currency;
+IndFinal: currency;
+IndPres: currency;
+IndIntermed: currency;
+Procemi: currency;
+VerProc: string;
+Data: tdate;
+
+function GetId: integer;
+function GetVBc: currency;
+function GetVicms: currency;
+function GetVicmsdeson: currency;
+function GetVFcpUfDest: currency;
+function GetVfcp: currency;
+function GetVBcSt: currency;
+function GetVSt: currency;
+function GetVFcpSt: currency;
+function GetVFcpStret: currency;
+function GetVProd: currency;
+function GetVFrete: currency;
+function GetVSeg: currency;
+function GetVDesc: currency;
+function GetVii: currency;
+function GetVIpi: currency;
+function GetVIpideVol: currency;
+function GetVPis: currency;
+function GetVCofins: currency;
+function GetVOutro: currency;
+function GetVNf: currency;
+function GetVTotTrib: currency;
+function GetCUf: currency;
+function GetCNf: currency;
+function GetNaTop: string;
+function GetMode: currency;
+function GetSerie: currency;
+function GetNnf: currency;
+function GetDhEmi: tdate;
+function GetDhSaiEnt: tdate;
+function GetTpNf: currency;
+function GetIdDest: currency;
+function GetCMunFg: currency;
+function GetTpImp: currency;
+function GetTpEmis: currency;
+function GetCdv: currency;
+function GetTPamb: currency;
+function GetFinNfe: currency;
+function GetIndFinal: currency;
+function GetIndPres: currency;
+function GetIndIntermed: currency;
+function GetProcemi: currency;
+function GetVerProc: string;
+function GetData: tdate;
+
+procedure SetId(const Value: integer);
+procedure SetVBc(const Value: currency);
+procedure SetVicms(const Value: currency);
+procedure SetVicmsdeson(const Value: currency);
+procedure SetVFcpUfDest(const Value: currency);
+procedure SetVfcp(const Value: currency);
+procedure SetVBcST(const Value: currency);
+procedure SetVSt(const Value: currency);
+procedure SetVFcpSt(const Value: currency);
+procedure SetVFcpStret(const Value: currency);
+procedure SetVProd(const Value: currency);
+procedure SetVFrete(const Value: currency);
+procedure SetVSeg(const Value: currency);
+procedure SetVDesc(const Value: currency);
+procedure SetVii(const Value: currency);
+procedure SetVIpi(const Value: currency);
+procedure SetVIpideVol(const Value: currency);
+procedure SetVPis(const Value: currency);
+procedure SetVCofins(const Value: currency);
+procedure SetVOutro(const Value: currency);
+procedure SetVNf(const Value: currency);
+procedure SetVTotTrib(const Value: currency);
+procedure SetCUf(const Value: currency);
+procedure SetCNf(const Value: currency);
+procedure SetNaTop(const Value: string);
+procedure SetMode(const Value: currency);
+procedure SetSerie(const Value: currency);
+procedure SetNnf(const Value: currency);
+procedure SetDhEmi(const Value: tdate);
+procedure SetDhSaiEnt(const Value: tdate);
+procedure SetTpNf(const Value: currency);
+procedure SetIdDest(const Value: currency);
+procedure SetCMunFg(const Value: currency);
+procedure SetTpImp(const Value: currency);
+procedure SetTpEmis(const Value: currency);
+procedure SetCdv(const Value: currency);
+procedure SetTPamb(const Value: currency);
+procedure SetFiNNfe(const Value: currency);
+procedure SetIndFinal(const Value: currency);
+procedure SetIndPres(const Value: currency);
+procedure SetIndIntermed(const Value: currency);
+procedure SetProcemi(const Value: currency);
+procedure SetVerProc(const Value: string);
+procedure SetData(const Value: tdate);
+
+var
+conect : tconexao;
+Qry: Tuniquery;
+
+public
+
+property LId: integer read GetId write SetId;
+property LVicms: currency read GetVicms write SetVicms;
+property LVBc: currency read GetVBc write SetVBc;
+property LVIcmsdeson: currency read GetVIcmsdeson write SetVIcmsdeson;
+property LVFcpUfDest: currency read GetVFcpUfDest write SetVFcpUfDest;
+property LVfcp: currency read GetVfcp write SetVfcp;
+property LVBcSt: currency read GetVBcSt write SetVBcSt;
+property LVSt: currency read GetVSt write SetVSt;
+property LVFcpSt: currency read GetVFcpSt write SetVFcpSt;
+property LVFcpStret: currency read GetVFcpStret write SetVFcpStret;
+property LVProd: currency read GetVProd write SetVProd;
+property LVFrete: currency read GetVFrete write SetVFrete;
+property LVSeg: currency read GetVSeg write SetVSeg;
+property LVDesc: currency read GetVDesc write SetVDesc;
+property LVii: currency read GetVii write SetVii;
+property LVIpi: currency read GetVIpi write SetVIpi;
+property LVIpideVol: currency read GetVIpideVol write SetVIpideVol;
+property LVPis: currency read GetVPis write SetVPis;
+property LVCofins: currency read GetVCofins write SetVCofins;
+property LVOutro: currency read GetVOutro write SetVOutro;
+property LVNf: currency read GetVNf write SetVNf;
+property LVTotTrib: currency read GetVTotTrib write SetVTotTrib;
+property LCUf: currency read GetCUf write SetCUf;
+property LCNf: currency read GetCNf write SetCNf;
+property LNaTop: string read GetNaTop write SetNaTop;
+property LMode: currency read GetMode write SetMode;
+property LSerie: currency read GetSerie write SetSerie;
+property LNnf: currency read GetNnf write SetNnf;
+property LDhEmi: tdate read GetDhEmi write SetDhEmi;
+property LDhSaiEnt: tdate read GetDhSaiEnt write SetDhSaiEnt;
+property LTpNf: currency read GetTpNf write SetTpNf;
+property LIdDest: currency read GetIdDest write SetIdDest;
+property LCMunFg: currency read GetCMunFg write SetCMunFg;
+property LTpImp: currency read GetTpImp write SetTpImp;
+property LTpEmis: currency read GetTpEmis write SetTpEmis;
+property LCdv: currency read GetCdv write SetCdv;
+property LTPamb: currency read GetTPamb write SetTPamb;
+property LFinNfe: currency read GetFinNfe write SetFinNfe;
+property LIndFinal: currency read GetIndFinal write SetIndFinal;
+property LIndPres: currency read GetIndPres write SetIndPres;
+property LIndIntermed: currency read GetIndIntermed write SetIndIntermed;
+property LProcemi: currency read GetProcemi write SetProcemi;
+property LVerProc: string read GetVerProc write SetVerProc;
+property LData: Tdate read GetData write SetData;
+
+
+constructor create;
+destructor destroy;
+function SalvarNotasRepositorio(tipo:string;const EntradaRepositorio : TEntradaRepositorio;
+CNPJ:string;Complementar:string;Fisco:string;terceiros:string;cnpjdest:string;TipoNota:string;chave:string):boolean;
+function ListarNotasRepositorioPorPeriodo(Tipo:string;Dataini,Datafim:TDate):TUniQuery;
+function UltimoId(Tipo:string):Integer;
+function ListarNotas(Tipo:string):TUniQuery;
+function ListarObservaçõesComplementar(Tipo:string):TUniQuery;
+function ListarObservacaoFisco(Tipo:string):TUniQuery;
+function ListarEntradasESaidas:TUniQuery;
+
+end;
+type TFabricaNotas = class(TEntradaRepositorio)
+public
+constructor create;
+destructor destroy;
+
+function ListarSaidas(Dataini,DataFim:TDate):TUniQuery;
+
+end;
+
+
+
+implementation
+
+{ TEntradaRepositorio }
+
+constructor TEntradaRepositorio.create;
+begin
+  Conect:= TConexao.create('Local');
+  Qry:= TUniQuery.Create(nil);
+  Qry.Connection:= Conect.Conexao;
+end;
+
+destructor TEntradaRepositorio.destroy;
+begin
+  conect.Free;
+  Qry.Free;
+end;
+
+function TEntradaRepositorio.GetCdv: currency;
+begin
+Result := LCdv;
+end;
+
+function TEntradaRepositorio.GetCMunFg: currency;
+begin
+Result := LCMunFg;
+end;
+
+function TEntradaRepositorio.GetCNf: currency;
+begin
+Result := LCNf;
+end;
+
+function TEntradaRepositorio.GetCUf: currency;
+begin
+Result := LCUf;
+end;
+
+function TEntradaRepositorio.GetData: tdate;
+begin
+Result := LData;
+end;
+
+function TEntradaRepositorio.GetDhEmi: tdate;
+begin
+Result := LDhEmi;
+end;
+
+function TEntradaRepositorio.GetDhSaiEnt: tdate;
+begin
+Result := LDhSaiEnt;
+end;
+
+function TEntradaRepositorio.GetId: integer;
+begin
+Result := LId;
+end;
+
+function TEntradaRepositorio.GetIdDest: currency;
+begin
+Result := LIdDest;
+end;
+
+function TEntradaRepositorio.GetIndFinal: currency;
+begin
+Result := LIndFinal;
+end;
+
+function TEntradaRepositorio.GetIndIntermed: currency;
+begin
+Result := LIndIntermed;
+end;
+
+function TEntradaRepositorio.GetIndPres: currency;
+begin
+Result := LIndPres;
+end;
+
+function TEntradaRepositorio.GetMode: currency;
+begin
+Result := LMode;
+end;
+
+function TEntradaRepositorio.GetNaTop: string;
+begin
+Result := LNaTop;
+end;
+
+function TEntradaRepositorio.GetNnf: currency;
+begin
+Result := LNnf;
+end;
+
+function TEntradaRepositorio.GetFiNNfe: currency;
+begin
+Result := LFiNNfe;
+end;
+
+function TEntradaRepositorio.GetTPamb: currency;
+begin
+Result := LTPamb;
+end;
+
+function TEntradaRepositorio.GetProcemi: currency;
+begin
+Result := LProcemi;
+end;
+
+function TEntradaRepositorio.GetSerie: currency;
+begin
+Result := LSerie;
+end;
+
+function TEntradaRepositorio.GetTpEmis: currency;
+begin
+Result := LTpEmis;
+end;
+
+function TEntradaRepositorio.GetTpImp: currency;
+begin
+Result := LTpImp;
+end;
+
+function TEntradaRepositorio.GetTpNf: currency;
+begin
+Result := LTpNf;
+end;
+
+function TEntradaRepositorio.GetVBc: currency;
+begin
+Result := LVBc;
+end;
+
+function TEntradaRepositorio.GetVBcSt: currency;
+begin
+Result := LVBcST;
+end;
+
+function TEntradaRepositorio.GetVCofins: currency;
+begin
+Result := LVCofins;
+end;
+
+function TEntradaRepositorio.GetVDesc: currency;
+begin
+Result := LVDesc;
+end;
+
+function TEntradaRepositorio.GetVerProc: string;
+begin
+Result := LVerProc;
+end;
+
+function TEntradaRepositorio.GetVfcp: currency;
+begin
+Result := LVfcp;
+end;
+
+function TEntradaRepositorio.GetVFcpSt: currency;
+begin
+Result := LVFcpSt;
+end;
+
+function TEntradaRepositorio.GetVFcpStret: currency;
+begin
+Result := LVFcpStret;
+end;
+
+function TEntradaRepositorio.GetVFcpUfDest: currency;
+begin
+Result := LVFcpUfDest;
+end;
+
+function TEntradaRepositorio.GetVFrete: currency;
+begin
+Result := LVFrete;
+end;
+
+function TEntradaRepositorio.GetVicms: currency;
+begin
+Result := LVicms;
+end;
+
+function TEntradaRepositorio.GetVicmsdeson: currency;
+begin
+Result := LVicmsdeson;
+end;
+
+function TEntradaRepositorio.GetVii: currency;
+begin
+Result := LVii;
+end;
+
+function TEntradaRepositorio.GetVIpi: currency;
+begin
+Result := LVIpi;
+end;
+
+function TEntradaRepositorio.GetVIpideVol: currency;
+begin
+Result := LVIpideVol;
+end;
+
+function TEntradaRepositorio.GetVNf: currency;
+begin
+Result := LVNf;
+end;
+
+function TEntradaRepositorio.GetVOutro: currency;
+begin
+Result := LVOutro;
+end;
+
+function TEntradaRepositorio.GetVPis: currency;
+begin
+Result := LVPis;
+end;
+
+function TEntradaRepositorio.GetVProd: currency;
+begin
+Result := LVProd;
+end;
+
+function TEntradaRepositorio.GetVSeg: currency;
+begin
+Result := LVSeg;
+end;
+
+function TEntradaRepositorio.GetVSt: currency;
+begin
+Result := LVSt;
+end;
+
+function TEntradaRepositorio.GetVTotTrib: currency;
+begin
+Result := LVTotTrib;
+end;
+
+function TEntradaRepositorio.ListarEntradasESaidas: TUniQuery;
+begin
+  Qry.SQL.Clear;
+  Qry.SQL.Add('SELECT * FROM ENTRADAS UNION SELECT * FROM SAIDAS');
+  try
+    Qry.Open;
+    Result:= Qry;
+  except
+    on Erro: exception do
+    ShowMessage('Erro:'+ Erro.Message);
+  end;
+end;
+
+function TEntradaRepositorio.ListarNotas(Tipo:string): TUniQuery;
+begin
+  Qry.SQL.Clear;
+  Qry.SQL.Add('SELECT NATOP FROM '+Tipo+' group by NATOP');
+  Qry.Open;
+  if Not Qry.IsEmpty then
+    Result:=Qry
+    else
+
+end;
+
+function TEntradaRepositorio.ListarNotasRepositorioPorPeriodo(tipo:string;Dataini,
+  Datafim: TDate): TUniQuery;
+begin
+   Qry.SQL.Add('SELECT * FROM ' + Tipo );
+  Qry.SQL.Add('WHERE DATA BETWEEN :pDataini AND :pDatafim');
+  Qry.Open;
+
+  if Qry.RecordCount > 0 then
+    Result := Qry
+  else
+  begin
+    ShowMessage('Não há Dados neste período');
+    Exit;
+  end;
+end;
+
+function TEntradaRepositorio.ListarObservacaoFisco(Tipo:string): TUniQuery;
+begin
+  Qry.SQL.Clear;
+  Qry.SQL.Add('SELECT FISCO FROM '+Tipo+' group by FISCO');
+  Qry.Open;
+  if Not Qry.IsEmpty then
+    Result:=Qry
+    else
+end;
+
+function TEntradaRepositorio.ListarObservaçõesComplementar(Tipo:string): TUniQuery;
+begin
+  Qry.SQL.Clear;
+  Qry.SQL.Add('SELECT COMPLEMENTAR FROM '+Tipo+' group by COMPLEMENTAR');
+  Qry.Open;
+  if Not Qry.IsEmpty then
+    Result:=Qry
+    else
+end;
+
+function TEntradaRepositorio.SalvarNotasRepositorio(
+  Tipo:string;const EntradaRepositorio: TEntradaRepositorio;CNPJ:string;
+  Complementar:string;Fisco:string;terceiros:string;cnpjdest:string;TipoNota:string;chave:string): boolean;
+begin
+  Qry.SQL.Clear;
+  Qry.SQL.Add
+    ('INSERT INTO '+ Tipo +' (VBC,VICMS,VICMSDESON,VFCPUFDEST,VFCP,VBCST,VST,VFCPST,');
+  Qry.SQL.Add('VFCPSTRET,VPROD,VFRETE,VSEG,VDESC,VII,VIPI,VIPIDEVOL,VPIS,VCOFINS,');
+  Qry.SQL.Add('VOUTRO,VNF,VTOTTRIB,CUF,CNF,NATOP,MOD,SERIE,NNF,DHEMI,DHSAIENT,TPNF,');
+  Qry.SQL.Add('IDDEST,CMUNFG,TPIMP,TPEMIS,CDV,TPAMB,FINNFE,INDFINAL,INDPRES,');
+  Qry.SQL.Add('INDINTERMED,PROCEMI,VERPROC,DATA,CNPJ,COMPLEMENTAR,FISCO,TERCEIROS,CNPJDEST,TIPO,CHAVE)');
+  Qry.SQL.Add
+    ('VALUES(:pVBC,:pVICMS,:pVICMSDESON,:pVFCPUFDEST,:pVFCP,:pVBCST,:pVST,:pVFCPST,');
+  Qry.SQL.Add(':pVFCPSTRET,:pVPROD,:pVFRETE,:pVSEG,:pVDESC,:pVII,:pVIPI,:pVIPIDEVOL,');
+  Qry.SQL.Add(':pVPIS,:pVCOFINS,:pVOUTRO,:pVNF,:pVTOTTRIB,:pCUF,:pCNF,:pNATOP,');
+  Qry.SQL.Add(':pMOD,:pSERIE,:pNNF,:pDHEMI,:pDHSAIENT,:pTPNF,:pIDDEST,:pCMUNFG,:pTPIMP,');
+  Qry.SQL.Add(':pTPEMIS,:pCDV,:pTPAMB,:pFINNFE,:pINDFINAL,:pINDPRES,:pINDINTERMED,');
+  Qry.SQL.Add(':pPROCEMI,:pVERPROC,:pDATA,:pCNPJ,:pCOMPLEMENTAR,:pFISCO,:PTERCEIROS,:PCNPJDEST,:PTIPO,:PCHAVE)');
+   Qry.Params.ParamByName('pVBC').AsCurrency := EntradaRepositorio.vbc;
+  Qry.Params.ParamByName('pVICMS').AsCurrency := EntradaRepositorio.vicms;
+  Qry.Params.ParamByName('pVICMSDESON').AsCurrency := EntradaRepositorio.vicmsdeson;
+  Qry.Params.ParamByName('pVFCPUFDEST').AsCurrency := EntradaRepositorio.vfcpufdest;
+  Qry.Params.ParamByName('pVFCP').AsCurrency := EntradaRepositorio.vfcp;
+  Qry.Params.ParamByName('pVBCST').AsCurrency := EntradaRepositorio.vbcst;
+  Qry.Params.ParamByName('pVST').AsCurrency := EntradaRepositorio.vst;
+  Qry.Params.ParamByName('pVFCPST').AsCurrency := EntradaRepositorio.vfcpst;
+  Qry.Params.ParamByName('pVFCPSTRET').AsCurrency := EntradaRepositorio.vfcpstret;
+  Qry.Params.ParamByName('pVPROD').AsCurrency := EntradaRepositorio.vprod;
+  Qry.Params.ParamByName('pVFRETE').AsCurrency := EntradaRepositorio.vfrete;
+  Qry.Params.ParamByName('pVSEG').AsCurrency := EntradaRepositorio.vseg;
+  Qry.Params.ParamByName('pVDESC').AsCurrency := EntradaRepositorio.vdesc;
+  Qry.Params.ParamByName('pVII').AsCurrency := EntradaRepositorio.vii;
+  Qry.Params.ParamByName('pVIPI').AsCurrency := EntradaRepositorio.vipi;
+  Qry.Params.ParamByName('pVIPIDEVOL').AsCurrency:= EntradaRepositorio.vipidevol;
+  Qry.Params.ParamByName('pVPIS').AsCurrency:= EntradaRepositorio.vpis;
+  Qry.Params.ParamByName('pVCOFINS').AsCurrency:= EntradaRepositorio.vcofins;
+  Qry.Params.ParamByName('pVOUTRO').AsCurrency:= EntradaRepositorio.voutro;
+  Qry.Params.ParamByName('pVNF').AsCurrency:= EntradaRepositorio.vnf;
+  Qry.Params.ParamByName('pVTOTTRIB').AsCurrency:= EntradaRepositorio.vtottrib;
+  Qry.Params.ParamByName('pCUF').AsCurrency:= EntradaRepositorio.cuf;
+  Qry.Params.ParamByName('pCNF').AsCurrency:= EntradaRepositorio.cnf;
+  Qry.Params.ParamByName('pNATOP').AsString:= EntradaRepositorio.natop;
+  Qry.Params.ParamByName('pMOD').AsCurrency:= EntradaRepositorio.mode;
+  Qry.Params.ParamByName('pSERIE').AsCurrency:= EntradaRepositorio.serie;
+  Qry.Params.ParamByName('pNNF').AsCurrency:= EntradaRepositorio.nnf;
+  Qry.Params.ParamByName('pDHEMI').AsDate:= EntradaRepositorio.dhemi;
+  Qry.Params.ParamByName('pDHSAIENT').AsDate:= EntradaRepositorio.dhsaient;
+  Qry.Params.ParamByName('pTPNF').AsCurrency:= EntradaRepositorio.tpnf;
+  Qry.Params.ParamByName('pIDDEST').AsCurrency:= EntradaRepositorio.iddest;
+  Qry.Params.ParamByName('pCMUNFG').AsCurrency:= EntradaRepositorio.cmunfg;
+  Qry.Params.ParamByName('pTPIMP').AsCurrency:= EntradaRepositorio.tpimp;
+  Qry.Params.ParamByName('pTPEMIS').AsCurrency:= EntradaRepositorio.tpemis;
+  Qry.Params.ParamByName('pCDV').AsCurrency:= EntradaRepositorio.cdv;
+  Qry.Params.ParamByName('pTPAMB').AsCurrency:= EntradaRepositorio.tpamb;
+  Qry.Params.ParamByName('pFINNFE').AsCurrency:= EntradaRepositorio.finnfe;
+  Qry.Params.ParamByName('pINDFINAL').AsCurrency:= EntradaRepositorio.indfinal;
+  Qry.Params.ParamByName('pINDPRES').AsCurrency:= EntradaRepositorio.indpres;
+  Qry.Params.ParamByName('pINDINTERMED').AsCurrency:= EntradaRepositorio.indintermed;
+  Qry.Params.ParamByName('pPROCEMI').AsCurrency:= EntradaRepositorio.procemi;
+  Qry.Params.ParamByName('pVERPROC').AsString:= EntradaRepositorio.VerProc;
+  Qry.Params.ParamByName('pDATA').AsDate := Date;
+  Qry.Params.ParamByName('pCNPJ').AsString := CNPJ;
+  Qry.Params.ParamByName('pCOMPLEMENTAR').AsString:= Complementar;
+  Qry.Params.ParamByName('pFISCO').AsString:= Fisco;
+  Qry.Params.ParamByName('pCNPJDEST').AsString:= cnpjdest;
+  Qry.Params.ParamByName('pTERCEIROS').AsString:= terceiros;
+  Qry.Params.ParamByName('pTIPO').AsString:= TipoNota;
+  Qry.Params.ParamByName('pCHAVE').AsString:= chave;
+  try
+    Qry.Execute;
+    Result := True;
+  except
+    on Erro: Exception do
+    ShowMessage('Erro: '+Erro.Message);
+
+  end;
+end;
+
+procedure TEntradaRepositorio.SetCdv(const Value: currency);
+begin
+Cdv := Value;
+end;
+
+procedure TEntradaRepositorio.SetCMunFg(const Value: currency);
+begin
+CMunFg := Value;
+end;
+
+procedure TEntradaRepositorio.SetCNf(const Value: currency);
+begin
+CNf := Value;
+end;
+
+procedure TEntradaRepositorio.SetCUf(const Value: currency);
+begin
+CUf := Value;
+end;
+
+procedure TEntradaRepositorio.SetData(const Value: tdate);
+begin
+Data := Value;
+end;
+
+procedure TEntradaRepositorio.SetDhEmi(const Value: tdate);
+begin
+DhEmi := Value;
+end;
+
+procedure TEntradaRepositorio.SetDhSaiEnt(const Value: tdate);
+begin
+DhSaiEnt := Value;
+end;
+
+procedure TEntradaRepositorio.SetId(const Value: integer);
+begin
+Id := Value;
+end;
+
+procedure TEntradaRepositorio.SetIdDest(const Value: currency);
+begin
+IdDest := Value;
+end;
+
+procedure TEntradaRepositorio.SetIndFinal(const Value: currency);
+begin
+IndFinal := Value;
+end;
+
+procedure TEntradaRepositorio.SetIndIntermed(const Value: currency);
+begin
+IndIntermed := Value;
+end;
+
+procedure TEntradaRepositorio.SetIndPres(const Value: currency);
+begin
+IndPres := Value;
+end;
+
+procedure TEntradaRepositorio.SetMode(const Value: currency);
+begin
+Mode := Value;
+end;
+
+procedure TEntradaRepositorio.SetNaTop(const Value: string);
+begin
+NaTop := Value;
+end;
+
+procedure TEntradaRepositorio.SetNnf(const Value: currency);
+begin
+Nnf := Value;
+end;
+
+procedure TEntradaRepositorio.SetFinNfe(const Value: currency);
+begin
+FinNfe := Value;
+end;
+
+procedure TEntradaRepositorio.SetTPamb(const Value: currency);
+begin
+tPamb := Value;
+end;
+
+procedure TEntradaRepositorio.SetProcemi(const Value: currency);
+begin
+Procemi := Value;
+end;
+
+procedure TEntradaRepositorio.SetSerie(const Value: currency);
+begin
+Serie := Value;
+end;
+
+procedure TEntradaRepositorio.SetTpEmis(const Value: currency);
+begin
+TpEmis := Value;
+end;
+
+procedure TEntradaRepositorio.SetTpImp(const Value: currency);
+begin
+TpImp := Value;
+end;
+
+procedure TEntradaRepositorio.SetTpNf(const Value: currency);
+begin
+TpNf := Value;
+end;
+
+procedure TEntradaRepositorio.SetVBc(const Value: currency);
+begin
+VBc := Value;
+end;
+
+procedure TEntradaRepositorio.SetVBcST(const Value: currency);
+begin
+VBcSt := Value;
+end;
+
+procedure TEntradaRepositorio.SetVCofins(const Value: currency);
+begin
+VCofins := Value;
+end;
+
+procedure TEntradaRepositorio.SetVDesc(const Value: currency);
+begin
+VDesc := Value;
+end;
+
+procedure TEntradaRepositorio.SetVerProc(const Value: string);
+begin
+VerProc := Value;
+end;
+
+procedure TEntradaRepositorio.SetVfcp(const Value: currency);
+begin
+Vfcp := Value;
+end;
+
+procedure TEntradaRepositorio.SetVFcpSt(const Value: currency);
+begin
+VFcpSt := Value;
+end;
+
+procedure TEntradaRepositorio.SetVFcpStret(const Value: currency);
+begin
+VFcpStret := Value;
+end;
+
+procedure TEntradaRepositorio.SetVFcpUfDest(const Value: currency);
+begin
+VFcpUfDest := Value;
+end;
+
+procedure TEntradaRepositorio.SetVFrete(const Value: currency);
+begin
+VFrete := Value;
+end;
+
+procedure TEntradaRepositorio.SetVicms(const Value: currency);
+begin
+VIcms := Value;
+end;
+
+procedure TEntradaRepositorio.SetVicmsdeson(const Value: currency);
+begin
+Vicms := Value;
+end;
+
+procedure TEntradaRepositorio.SetVii(const Value: currency);
+begin
+Vii := Value;
+end;
+
+procedure TEntradaRepositorio.SetVIpi(const Value: currency);
+begin
+VIpi := Value;
+end;
+
+procedure TEntradaRepositorio.SetVIpideVol(const Value: currency);
+begin
+VipideVol := Value;
+end;
+
+procedure TEntradaRepositorio.SetVNf(const Value: currency);
+begin
+VNf := Value;
+end;
+
+procedure TEntradaRepositorio.SetVOutro(const Value: currency);
+begin
+VOutro := Value;
+end;
+
+procedure TEntradaRepositorio.SetVPis(const Value: currency);
+begin
+VPis := Value;
+end;
+
+procedure TEntradaRepositorio.SetVProd(const Value: currency);
+begin
+VProd := Value;
+end;
+
+procedure TEntradaRepositorio.SetVSeg(const Value: currency);
+begin
+VSeg := Value;
+end;
+
+procedure TEntradaRepositorio.SetVSt(const Value: currency);
+begin
+VSt := Value;
+end;
+
+procedure TEntradaRepositorio.SetVTotTrib(const Value: currency);
+begin
+VTotTrib := Value;
+end;
+
+function TEntradaRepositorio.UltimoId(Tipo:string): Integer;
+var
+Generat:string;
+begin
+ if Tipo = 'Terceiros' then
+    Generat := 'ENTRADAS_ID_GEN';
+
+ if (Tipo = '55') or (Tipo ='65') then
+    Generat:= 'SAIDAS_ID_GEN';
+  Qry.SQL.Clear;
+  Qry.SQL.Add('select gen_id('+Generat+',0) from rdb$database ');
+  try
+    Qry.Open;
+    Result:= Qry.Fields[0].AsInteger;
+
+  finally
+
+  end;
+
+
+end;
+
+{ TFabricaNotas }
+
+constructor TFabricaNotas.create;
+begin
+  Conect:= TConexao.create('Local');
+  Qry:= TUniQuery.Create(nil);
+  Qry.Connection:= Conect.Conexao;
+end;
+
+destructor TFabricaNotas.destroy;
+begin
+  Qry.Free;
+  conect.Free;
+end;
+
+function TFabricaNotas.ListarSaidas(Dataini,DataFim:TDate): TUniQuery;
+begin
+  Qry.SQL.Clear;
+  Qry.SQL.Add('SELECT * FROM SAIDAS WHERE DATA BETWEEN :Dataini AND :DataFim');
+  Qry.Params.ParamByName('Dataini').AsDate := DataIni;
+  Qry.Params.ParamByName('DataFim').AsDate := DataFim;
+  Qry.Open;
+end;
+
+end.

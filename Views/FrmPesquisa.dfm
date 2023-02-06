@@ -1,0 +1,55 @@
+object FPesquisa: TFPesquisa
+  Left = 0
+  Top = 0
+  Caption = 'Pesquisa'
+  ClientHeight = 362
+  ClientWidth = 589
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poMainFormCenter
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Panel1: TPanel
+    Left = 0
+    Top = 0
+    Width = 589
+    Height = 73
+    Align = alTop
+    TabOrder = 0
+    object Pesquisa: TLabeledEdit
+      Left = 8
+      Top = 27
+      Width = 553
+      Height = 21
+      EditLabel.Width = 42
+      EditLabel.Height = 13
+      EditLabel.Caption = 'Pesquisa'
+      TabOrder = 0
+    end
+  end
+  object Dbgrid: TDBGrid
+    Left = 0
+    Top = 73
+    Width = 589
+    Height = 289
+    Align = alClient
+    DataSource = Dts
+    ReadOnly = True
+    TabOrder = 1
+    TitleFont.Charset = DEFAULT_CHARSET
+    TitleFont.Color = clWindowText
+    TitleFont.Height = -11
+    TitleFont.Name = 'Tahoma'
+    TitleFont.Style = []
+    OnCellClick = DbgridCellClick
+  end
+  object Dts: TDataSource
+    Left = 184
+    Top = 136
+  end
+end

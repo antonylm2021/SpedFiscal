@@ -1,0 +1,1023 @@
+unit Frmconversor;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics, CLRClasses,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.DBCtrls, Vcl.Mask,
+  Vcl.Grids, Vcl.DBGrids, Vcl.ExtCtrls, Vcl.ComCtrls, Data.DB,
+  Datasnap.DBClient, DBXCommon, DBXFirebird,
+  Data.FMTBcd, Data.SqlExpr, Datasnap.Provider, PCNCONVERSAO, pcnconversaonfe,
+  RpRave, RpDefine, RpCon, RpConDS, ACBrDFeUtil, ACBrDevice,
+  ACBrETQ, ACBrETQZplII, ACBrBase, System.Math, uni, Conexao,
+  Participante, Empresa, REntradaRepositorio, itens, StrUtils,
+  ACBrDFe, ACBrNFe;
+
+type
+  TFConversor = class(TForm)
+    OpenDialog1: TOpenDialog;
+    Edt55: TLabeledEdit;
+    Edt65: TLabeledEdit;
+    EdtTerceiros: TLabeledEdit;
+    EdtServicos: TLabeledEdit;
+    Button1: TButton;
+    Button2: TButton;
+    Button3: TButton;
+    Button4: TButton;
+    Btn55: TButton;
+    Btn65: TButton;
+    Btnterceiros: TButton;
+    BtnServicos: TButton;
+    Label1: TLabel;
+    Memo55: TMemo;
+    ACBrNFe: TACBrNFe;
+    MemoRetorno: TMemo;
+    ProgressBar1: TProgressBar;
+    procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
+    procedure Btn55Click(Sender: TObject);
+    procedure Btn65Click(Sender: TObject);
+    procedure BtnterceirosClick(Sender: TObject);
+    procedure BtnServicosClick(Sender: TObject);
+    procedure Importar(Qtd: Integer; Tipo: string);
+    procedure ListarXml(Tipo: string);
+    procedure ListarArquivos(diretorio, Tipo: string);
+    procedure Localiza(Tipo: string);
+    function ImportarDadosDestinatiosEEmitentes(Tipo: string): Boolean;
+    function ImportarDadosEmitenteNaoCadastrado: Boolean;
+    function ImportarNotas(Tipo: string): Boolean;
+    function ImportarItens(Tipo: string): Boolean;
+
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FConversor: TFConversor;
+  Repositorio: TParticipante;
+  Empresa: TEmpresa;
+  Notas: TEntradaRepositorio;
+  itens: TItens;
+
+implementation
+
+{$R *.dfm}
+
+procedure TFConversor.Btn55Click(Sender: TObject);
+begin
+  Localiza('55');
+end;
+
+procedure TFConversor.Btn65Click(Sender: TObject);
+begin
+  Localiza('65');
+end;
+
+procedure TFConversor.BtnServicosClick(Sender: TObject);
+begin
+  Localiza('Serviço');
+end;
+
+procedure TFConversor.BtnterceirosClick(Sender: TObject);
+begin
+  Localiza('Terceiros');
+end;
+
+procedure TFConversor.Button1Click(Sender: TObject);
+begin
+  OpenDialog1.execute;
+  Edt55.text := ExtractFilePath(OpenDialog1.FileName);
+  if Edt55.text <> '' then
+    ListarXml('55');
+end;
+
+procedure TFConversor.Button2Click(Sender: TObject);
+begin
+  OpenDialog1.execute;
+  Edt65.text := ExtractFilePath(OpenDialog1.FileName);
+  if Edt65.text <> '' then
+    ListarXml('65');
+end;
+
+procedure TFConversor.Button3Click(Sender: TObject);
+begin
+  OpenDialog1.execute;
+  EdtTerceiros.text := ExtractFilePath(OpenDialog1.FileName);
+  if EdtTerceiros.text <> '' then
+    ListarXml('Terceiros');
+end;
+
+procedure TFConversor.Button4Click(Sender: TObject);
+begin
+  OpenDialog1.execute;
+  EdtServicos.text := ExtractFilePath(OpenDialog1.FileName);
+  if EdtServicos.text <> '' then
+    ListarXml('Serviços');
+end;
+
+procedure TFConversor.Importar(Qtd: Integer; Tipo: string);
+var
+  i: Integer;
+  UltimaNota:string;
+begin
+  ProgressBar1.Max := Qtd;
+  ProgressBar1.Position := 0;
+
+  Repositorio := TParticipante.create;
+  Empresa := TEmpresa.create;
+  Notas := TEntradaRepositorio.create;
+  itens := TItens.create;
+
+    for i := 0 to Qtd do
+    begin
+      try
+        UltimaNota:= Memo55.Lines[i];
+        ProgressBar1.Position := i;
+        ACBrNFe.NotasFiscais.Clear;
+        ACBrNFe.NotasFiscais.LoadFromFile(Memo55.Lines[i]);
+        try
+        ImportarDadosDestinatiosEEmitentes(Tipo);
+        ImportarNotas(Tipo);
+        ImportarItens(Tipo);
+        finally
+         ShowMessage('Importação Modelo ' + Tipo + ' Concluída!');
+        end;
+      except
+        MemoRetorno.Lines.Add('Erro na Nota: '+UltimaNota);
+
+      end;
+    end;
+
+
+end;
+
+function TFConversor.ImportarDadosDestinatiosEEmitentes(Tipo: string): Boolean;
+begin
+  if Tipo = '55' then
+  begin
+    Repositorio.LXnome := ACBrNFe.NotasFiscais.Items[0].NFe.Dest.xNome;
+    Repositorio.LCNPJ := ACBrNFe.NotasFiscais.Items[0].NFe.Dest.CNPJCPF;
+    Repositorio.LXlgr := ACBrNFe.NotasFiscais.Items[0].NFe.Dest.EnderDest.xLgr;
+    Repositorio.LXcpl := ACBrNFe.NotasFiscais.Items[0].NFe.Dest.EnderDest.xCpl;
+    Repositorio.LXBairro := ACBrNFe.NotasFiscais.Items[0]
+      .NFe.Dest.EnderDest.xBairro;
+    Repositorio.LCMun := ACBrNFe.NotasFiscais.Items[0].NFe.Dest.EnderDest.cMun;
+    Repositorio.LXnum := ACBrNFe.NotasFiscais.Items[0].NFe.Dest.EnderDest.xMun;
+    Repositorio.LUf := ACBrNFe.NotasFiscais.Items[0].NFe.Dest.EnderDest.UF;
+    Repositorio.LCep := IntToStr(ACBrNFe.NotasFiscais.Items[0]
+      .NFe.Dest.EnderDest.CEP);
+    Repositorio.LcPais := ACBrNFe.NotasFiscais.Items[0]
+      .NFe.Dest.EnderDest.cPais;
+    Repositorio.LXPais := ACBrNFe.NotasFiscais.Items[0]
+      .NFe.Dest.EnderDest.xPais;
+    Repositorio.LFone := ACBrNFe.NotasFiscais.Items[0].NFe.Dest.EnderDest.fone;
+    if StrToIntDef(ACBrNFe.NotasFiscais.Items[0].NFe.Dest.EnderDest.nro, 0) = 0
+    then
+
+    else
+      Repositorio.LNro :=
+        StrToInt(ACBrNFe.NotasFiscais.Items[0].NFe.Dest.EnderDest.nro);
+
+    Repositorio.LIE := (ACBrNFe.NotasFiscais.Items[0].NFe.Dest.IE);
+    Repositorio.LEmail := (ACBrNFe.NotasFiscais.Items[0].NFe.Dest.Email);
+    Repositorio.LData := (ACBrNFe.NotasFiscais.Items[0].NFe.Ide.dEmi);
+
+  end;
+  if Tipo = 'Terceiros' then
+  begin
+    Repositorio.LXnome := ACBrNFe.NotasFiscais.Items[0].NFe.Emit.xNome;
+    Repositorio.LCNPJ := ACBrNFe.NotasFiscais.Items[0].NFe.Emit.CNPJCPF;
+    Repositorio.LXlgr := ACBrNFe.NotasFiscais.Items[0].NFe.Emit.EnderEmit.xLgr;
+    Repositorio.LXcpl := ACBrNFe.NotasFiscais.Items[0].NFe.Emit.EnderEmit.xCpl;
+    Repositorio.LXBairro := ACBrNFe.NotasFiscais.Items[0]
+      .NFe.Emit.EnderEmit.xBairro;
+    Repositorio.LCMun := ACBrNFe.NotasFiscais.Items[0].NFe.Emit.EnderEmit.cMun;
+    Repositorio.LXnum := ACBrNFe.NotasFiscais.Items[0].NFe.Emit.EnderEmit.xMun;
+    Repositorio.LUf := ACBrNFe.NotasFiscais.Items[0].NFe.Emit.EnderEmit.UF;
+    Repositorio.LCep := IntToStr(ACBrNFe.NotasFiscais.Items[0]
+      .NFe.Emit.EnderEmit.CEP);
+    Repositorio.LcPais := ACBrNFe.NotasFiscais.Items[0]
+      .NFe.Emit.EnderEmit.cPais;
+    Repositorio.LXPais := ACBrNFe.NotasFiscais.Items[0]
+      .NFe.Emit.EnderEmit.xPais;
+    Repositorio.LFone := ACBrNFe.NotasFiscais.Items[0].NFe.Emit.EnderEmit.fone;
+    if StrToIntDef(ACBrNFe.NotasFiscais.Items[0].NFe.Emit.EnderEmit.nro, 0) = 0
+    then
+
+    else
+      Repositorio.LNro :=
+        StrToInt(ACBrNFe.NotasFiscais.Items[0].NFe.Emit.EnderEmit.nro);
+
+    Repositorio.LIE := (ACBrNFe.NotasFiscais.Items[0].NFe.Emit.IE);
+    Repositorio.LData := (ACBrNFe.NotasFiscais.Items[0].NFe.Ide.dEmi);
+
+  end;
+
+  if Tipo = '65' then
+  begin
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Dest.xNome <> '' then
+    begin
+      Repositorio.LXnome := ACBrNFe.NotasFiscais.Items[0].NFe.Dest.xNome;
+      Repositorio.LCNPJ := ACBrNFe.NotasFiscais.Items[0].NFe.Dest.CNPJCPF;
+      Repositorio.LXlgr := ACBrNFe.NotasFiscais.Items[0]
+        .NFe.Dest.EnderDest.xLgr;
+      Repositorio.LXcpl := ACBrNFe.NotasFiscais.Items[0]
+        .NFe.Dest.EnderDest.xCpl;
+      Repositorio.LXBairro := ACBrNFe.NotasFiscais.Items[0]
+        .NFe.Dest.EnderDest.xBairro;
+      Repositorio.LCMun := ACBrNFe.NotasFiscais.Items[0]
+        .NFe.Dest.EnderDest.cMun;
+      Repositorio.LXnum := ACBrNFe.NotasFiscais.Items[0]
+        .NFe.Dest.EnderDest.xMun;
+      Repositorio.LUf := ACBrNFe.NotasFiscais.Items[0].NFe.Dest.EnderDest.UF;
+      Repositorio.LCep :=
+        IntToStr(ACBrNFe.NotasFiscais.Items[0].NFe.Dest.EnderDest.CEP);
+      Repositorio.LcPais := ACBrNFe.NotasFiscais.Items[0]
+        .NFe.Dest.EnderDest.cPais;
+      Repositorio.LXPais := ACBrNFe.NotasFiscais.Items[0]
+        .NFe.Dest.EnderDest.xPais;
+      Repositorio.LFone := ACBrNFe.NotasFiscais.Items[0]
+        .NFe.Dest.EnderDest.fone;
+      // Repositorio.LNro:= StrToInt(ACBrNFe.NotasFiscais.Items[0].NFe.Dest.EnderDest.nro);
+      Repositorio.LIE := (ACBrNFe.NotasFiscais.Items[0].NFe.Dest.IE);
+      Repositorio.LEmail := (ACBrNFe.NotasFiscais.Items[0].NFe.Dest.Email);
+      Repositorio.LData := (ACBrNFe.NotasFiscais.Items[0].NFe.Ide.dEmi);
+
+    end;
+  end;
+  try
+    if Repositorio.LXnome <> '' then
+      Repositorio.SalvarParticipante(Repositorio);
+  finally
+    if Repositorio.LXnome <> '' then
+    begin
+      MemoRetorno.Lines.Add('Participante Importado: '+Repositorio.LXnome);
+    end;
+  end;
+
+end;
+
+function TFConversor.ImportarDadosEmitenteNaoCadastrado: Boolean;
+
+begin
+  Empresa.LXnome := ACBrNFe.NotasFiscais.Items[0].NFe.Emit.xNome;
+  Empresa.LCNPJ := ACBrNFe.NotasFiscais.Items[0].NFe.Emit.CNPJCPF;
+  Empresa.LXlgr := ACBrNFe.NotasFiscais.Items[0].NFe.Emit.EnderEmit.xLgr;
+  Empresa.LXcpl := ACBrNFe.NotasFiscais.Items[0].NFe.Emit.EnderEmit.xCpl;
+  Empresa.LXBairro := ACBrNFe.NotasFiscais.Items[0].NFe.Emit.EnderEmit.xBairro;
+  Empresa.LCMun := ACBrNFe.NotasFiscais.Items[0].NFe.Emit.EnderEmit.cMun;
+  Empresa.LXnum := ACBrNFe.NotasFiscais.Items[0].NFe.Emit.EnderEmit.xMun;
+  Empresa.LUf := ACBrNFe.NotasFiscais.Items[0].NFe.Emit.EnderEmit.UF;
+  Empresa.LCep := IntToStr(ACBrNFe.NotasFiscais.Items[0]
+    .NFe.Emit.EnderEmit.CEP);
+  Empresa.LcPais := ACBrNFe.NotasFiscais.Items[0].NFe.Emit.EnderEmit.cPais;
+  Empresa.LXPais := ACBrNFe.NotasFiscais.Items[0].NFe.Emit.EnderEmit.xPais;
+  Empresa.LFone := ACBrNFe.NotasFiscais.Items[0].NFe.Emit.EnderEmit.fone;
+
+  MemoRetorno.Lines.Add(ACBrNFe.NotasFiscais.Items[0].NFe.Emit.xNome);
+  MemoRetorno.Lines.Add(ACBrNFe.NotasFiscais.Items[0].NFe.Emit.CNPJCPF);
+  MemoRetorno.Lines.Add(ACBrNFe.NotasFiscais.Items[0].NFe.Emit.EnderEmit.xLgr);
+  MemoRetorno.Lines.Add(ACBrNFe.NotasFiscais.Items[0].NFe.Emit.EnderEmit.xCpl);
+  MemoRetorno.Lines.Add(ACBrNFe.NotasFiscais.Items[0]
+    .NFe.Emit.EnderEmit.xBairro);
+  MemoRetorno.Lines.Add(IntToStr(ACBrNFe.NotasFiscais.Items[0]
+    .NFe.Emit.EnderEmit.cMun));
+  MemoRetorno.Lines.Add(ACBrNFe.NotasFiscais.Items[0].NFe.Emit.EnderEmit.xMun);
+  MemoRetorno.Lines.Add(ACBrNFe.NotasFiscais.Items[0].NFe.Emit.EnderEmit.UF);
+  MemoRetorno.Lines.Add(IntToStr(ACBrNFe.NotasFiscais.Items[0]
+    .NFe.Emit.EnderEmit.CEP));
+  MemoRetorno.Lines.Add(IntToStr(ACBrNFe.NotasFiscais.Items[0]
+    .NFe.Emit.EnderEmit.cPais));
+  MemoRetorno.Lines.Add(ACBrNFe.NotasFiscais.Items[0].NFe.Emit.EnderEmit.xPais);
+  MemoRetorno.Lines.Add(ACBrNFe.NotasFiscais.Items[0].NFe.Emit.EnderEmit.fone);
+
+end;
+
+function TFConversor.ImportarItens(Tipo: string): Boolean;
+var
+  i, IdNotas: Integer;
+begin
+  IdNotas := 0;
+
+  IdNotas := Notas.UltimoId(Tipo);
+
+  for i := 0 to ACBrNFe.NotasFiscais.Items[0].NFe.Det.Count - 1 do
+  begin
+    // Dados do Produto
+    itens.LXProd := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Prod.xProd;
+    itens.LCprod := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Prod.cProd;
+    itens.LCean := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Prod.cEAN;
+    itens.LNcm := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Prod.NCM;
+    itens.LCbeNef := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Prod.cBenef;
+    itens.LCfop := StrToCurr(ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Prod.CFOP);
+    itens.LUCom := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Prod.uCom;
+    itens.LQCom := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Prod.qCom;
+    itens.LVunCom := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Prod.vUnCom;
+    itens.LVProd := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Prod.vProd;
+    itens.LCeanTrib := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Prod.cEANTrib;
+    itens.LUTrib := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Prod.uTrib;
+    itens.LQTrib := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Prod.qTrib;
+    itens.LVunTrib := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Prod.vUnTrib;
+    itens.LCest := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Prod.CEST;
+    // Imposto
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.orig = oeNacional
+    then
+      itens.LOrig := 0;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.orig = oeEstrangeiraImportacaoDireta
+    then
+      itens.LOrig := 1;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.orig = oeEstrangeiraAdquiridaBrasil
+    then
+      itens.LOrig := 2;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.orig = oeEstrangeiraAdquiridaBrasil
+    then
+      itens.LOrig := 3;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.orig = oeNacionalProcessosBasicos
+    then
+      itens.LOrig := 4;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.orig = oeNacionalConteudoImportacaoInferiorIgual40
+    then
+      itens.LOrig := 5;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.orig = oeEstrangeiraImportacaoDiretaSemSimilar
+    then
+      itens.LOrig := 6;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.orig = oeEstrangeiraAdquiridaBrasilSemSimilar
+    then
+      itens.LOrig := 7;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.orig = oeNacionalConteudoImportacaoSuperior70
+    then
+      itens.LOrig := 8;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.orig = oeReservadoParaUsoFuturo
+    then
+      itens.LOrig := 9;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.orig = oeVazio
+    then
+      itens.LOrig := 10;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CST = cst00
+    then
+      itens.LCst := 00;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CST = cst10
+    then
+      itens.LCst := 10;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CST = cst20
+    then
+      itens.LCst := 20;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CST = cst30
+    then
+      itens.LCst := 30;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CST = cst40
+    then
+      itens.LCst := 40;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CST = cst50
+    then
+      itens.LCst := 50;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CST = cst60
+    then
+      itens.LCst := 60;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CST = cst70
+    then
+      itens.LCst := 70;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CST = cst80
+    then
+      itens.LCst := 80;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CST = cst90
+    then
+      itens.LCst := 90;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CST = cst51
+    then
+      itens.LCst := 51;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CST = cst41
+    then
+      itens.LCst := 41;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CST = cst45
+    then
+      itens.LCst := 45;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CST = cst81
+    then
+      itens.LCst := 81;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CSOSN = csosn101
+    then
+      itens.LCst := 101;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CSOSN = csosn102
+    then
+      itens.LCst := 102;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CSOSN = csosn103
+    then
+      itens.LCst := 103;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CSOSN = csosn201
+    then
+      itens.LCst := 201;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CSOSN = csosn202
+    then
+      itens.LCst := 202;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CSOSN = csosn203
+    then
+      itens.LCst := 203;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CSOSN = csosn300
+    then
+      itens.LCst := 300;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CSOSN = csosn400
+    then
+      itens.LCst := 400;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CSOSN = csosn500
+    then
+      itens.LCst := 500;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.CSOSN = csosn900
+    then
+      itens.LCst := 900;
+
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.modBC = dbiMargemValorAgregado
+    then
+      itens.LModBc := 0;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.modBC = dbiPauta
+    then
+      itens.LModBc := 1;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.modBC = dbiPrecoTabelado
+    then
+      itens.LModBc := 2;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.modBC = dbiValorOperacao
+    then
+      itens.LModBc := 3;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.modBC = dbiNenhum
+    then
+      itens.LModBc := 4;
+
+    itens.LVBc := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.vBC;
+    itens.LPIcms := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.pICMS;
+    itens.LVIcms := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.vICMS;
+    itens.LVbcfcp := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.vBCFCP;
+    itens.LPFcp := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.pFCP;
+    itens.LVfcp := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.vFCP;
+    itens.LPmVast := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.pMVAST;
+    itens.LVBcSt := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.vBCST;
+    itens.LPIcmsSt := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.pICMSST;
+    itens.LVBcfcpSt := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.vBCFCPST;
+    itens.LPFcpSt := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.pFCPST;
+    itens.LVIcmsdeson := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.vICMSDeson;
+
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.motDesICMS = mdiTaxi
+    then
+      itens.LMotDesIcms := 0;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.motDesICMS = mdiDeficienteFisico
+    then
+      itens.LMotDesIcms := 1;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.motDesICMS = mdiProdutorAgropecuario
+    then
+      itens.LMotDesIcms := 2;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.motDesICMS = mdiFrotistaLocadora
+    then
+      itens.LMotDesIcms := 3;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.motDesICMS = mdiDiplomaticoConsular
+    then
+      itens.LMotDesIcms := 4;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.motDesICMS = mdiAmazoniaLivreComercio
+    then
+      itens.LMotDesIcms := 5;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.motDesICMS = mdiSuframa
+    then
+      itens.LMotDesIcms := 6;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.motDesICMS = mdiVendaOrgaosPublicos
+    then
+      itens.LMotDesIcms := 7;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.motDesICMS = mdiOutros
+    then
+      itens.LMotDesIcms := 8;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.motDesICMS = mdiDeficienteCondutor
+    then
+      itens.LMotDesIcms := 9;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.motDesICMS = mdiDeficienteNaoCondutor
+    then
+      itens.LMotDesIcms := 10;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.motDesICMS = mdiOlimpiadaRio2016
+    then
+      itens.LMotDesIcms := 12;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.motDesICMS = mdiSolicitadoFisco
+    then
+      itens.LMotDesIcms := 13;
+
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.motDesICMSst = mdiTaxi then
+      itens.LmotDesICMSst := 0;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.motDesICMSst = mdiDeficienteFisico then
+      itens.LmotDesICMSst := 1;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.motDesICMSst = mdiProdutorAgropecuario then
+      itens.LmotDesICMSst := 2;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.motDesICMSst = mdiFrotistaLocadora then
+      itens.LmotDesICMSst := 3;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.motDesICMSst = mdiDiplomaticoConsular then
+      itens.LmotDesICMSst := 4;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.motDesICMSst = mdiAmazoniaLivreComercio then
+      itens.LmotDesICMSst := 5;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.motDesICMSst = mdiSuframa then
+      itens.LmotDesICMSst := 6;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.motDesICMSst = mdiVendaOrgaosPublicos then
+      itens.LmotDesICMSst := 7;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.motDesICMSst = mdiOutros then
+      itens.LmotDesICMSst := 8;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.motDesICMSst = mdiDeficienteCondutor then
+      itens.LmotDesICMSst := 9;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.motDesICMSst = mdiDeficienteNaoCondutor then
+      itens.LmotDesICMSst := 10;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.motDesICMSst = mdiOlimpiadaRio2016 then
+      itens.LmotDesICMSst := 12;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.motDesICMSst = mdiSolicitadoFisco then
+      itens.LmotDesICMSst := 13;
+
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.modBCST = dbisPrecoTabelado
+    then
+      itens.LModBcSt := 0;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.modBCST = dbisListaNegativa
+    then
+      itens.LModBcSt := 1;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.modBCST = dbisListaPositiva
+    then
+      itens.LModBcSt := 2;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.modBCST = dbisListaNeutra
+    then
+      itens.LModBcSt := 3;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.modBCST = dbisMargemValorAgregado
+    then
+      itens.LModBcSt := 4;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.modBCST = dbisPauta
+    then
+      itens.LModBcSt := 5;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.modBCST = dbisValordaOperacao
+    then
+      itens.LModBcSt := 6;
+
+    // Pis
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis01
+    then
+      itens.LCstPIS := 01;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis02
+    then
+      itens.LCstPIS := 02;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis03
+    then
+      itens.LCstPIS := 03;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis04
+    then
+      itens.LCstPIS := 04;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis05
+    then
+      itens.LCstPIS := 05;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis06
+    then
+      itens.LCstPIS := 06;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis07
+    then
+      itens.LCstPIS := 07;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis08
+    then
+      itens.LCstPIS := 08;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis09
+    then
+      itens.LCstPIS := 09;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis49
+    then
+      itens.LCstPIS := 49;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis50
+    then
+      itens.LCstPIS := 50;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis51
+    then
+      itens.LCstPIS := 51;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis52
+    then
+      itens.LCstPIS := 52;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis53
+    then
+      itens.LCstPIS := 53;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis54
+    then
+      itens.LCstPIS := 54;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis55
+    then
+      itens.LCstPIS := 55;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis56
+    then
+      itens.LCstPIS := 56;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis60
+    then
+      itens.LCstPIS := 60;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis61
+    then
+      itens.LCstPIS := 61;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis62
+    then
+      itens.LCstPIS := 62;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis63
+    then
+      itens.LCstPIS := 63;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis64
+    then
+      itens.LCstPIS := 64;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis65
+    then
+      itens.LCstPIS := 65;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis66
+    then
+      itens.LCstPIS := 66;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis67
+    then
+      itens.LCstPIS := 67;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis70
+    then
+      itens.LCstPIS := 70;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis71
+    then
+      itens.LCstPIS := 71;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis72
+    then
+      itens.LCstPIS := 72;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis73
+    then
+      itens.LCstPIS := 73;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis74
+    then
+      itens.LCstPIS := 74;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis75
+    then
+      itens.LCstPIS := 75;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis98
+    then
+      itens.LCstPIS := 98;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.PIS.CST = pis99
+    then
+      itens.LCstPIS := 99;
+
+    itens.LVbcPis := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.PIS.vBC;
+    itens.LPpis := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.PIS.pPIS;
+    itens.LVpis := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.PIS.vPIS;
+    itens.LValiqProdPis := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.PIS.vAliqProd;
+    itens.LQbcProdPis := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.PIS.qBCProd;
+    // Cofins
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof01
+    then
+      itens.LCstcofins := 01;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof02
+    then
+      itens.LCstcofins := 02;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof03
+    then
+      itens.LCstcofins := 03;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof04
+    then
+      itens.LCstcofins := 04;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof05
+    then
+      itens.LCstcofins := 05;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof06
+    then
+      itens.LCstcofins := 06;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof07
+    then
+      itens.LCstcofins := 07;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof08
+    then
+      itens.LCstcofins := 08;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof09
+    then
+      itens.LCstcofins := 09;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof49
+    then
+      itens.LCstcofins := 49;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof50
+    then
+      itens.LCstcofins := 50;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof51
+    then
+      itens.LCstcofins := 51;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof52
+    then
+      itens.LCstcofins := 52;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof53
+    then
+      itens.LCstcofins := 53;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof54
+    then
+      itens.LCstcofins := 54;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof55
+    then
+      itens.LCstcofins := 55;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof56
+    then
+      itens.LCstcofins := 56;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof60
+    then
+      itens.LCstcofins := 60;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof61
+    then
+      itens.LCstcofins := 61;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof62
+    then
+      itens.LCstcofins := 62;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof63
+    then
+      itens.LCstcofins := 63;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof64
+    then
+      itens.LCstcofins := 64;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof65
+    then
+      itens.LCstcofins := 65;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof66
+    then
+      itens.LCstcofins := 66;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof67
+    then
+      itens.LCstcofins := 67;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof70
+    then
+      itens.LCstcofins := 70;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof71
+    then
+      itens.LCstcofins := 71;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof72
+    then
+      itens.LCstcofins := 72;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof73
+    then
+      itens.LCstcofins := 73;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof74
+    then
+      itens.LCstcofins := 74;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof75
+    then
+      itens.LCstcofins := 75;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof98
+    then
+      itens.LCstcofins := 98;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.COFINS.CST = cof99
+    then
+      itens.LCstcofins := 99;
+
+    itens.LVbCofins := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.COFINS.vBC;
+    itens.LPCofins := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.COFINS.pCOFINS;
+    itens.LVCofins := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.COFINS.vCOFINS;
+    itens.LValiqProdCofins := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.COFINS.vAliqProd;
+    itens.LQbcProdCofins := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.COFINS.qBCProd;
+
+    // Ipi
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.IPI.CST = ipi00
+    then
+      itens.LCstIpi := 00;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.IPI.CST = ipi49
+    then
+      itens.LCstIpi := 49;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.IPI.CST = ipi50
+    then
+      itens.LCstIpi := 50;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.IPI.CST = ipi99
+    then
+      itens.LCstIpi := 99;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.IPI.CST = ipi01
+    then
+      itens.LCstIpi := 01;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.IPI.CST = ipi02
+    then
+      itens.LCstIpi := 02;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.IPI.CST = ipi03
+    then
+      itens.LCstIpi := 03;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.IPI.CST = ipi04
+    then
+      itens.LCstIpi := 04;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.IPI.CST = ipi05
+    then
+      itens.LCstIpi := 05;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.IPI.CST = ipi51
+    then
+      itens.LCstIpi := 51;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.IPI.CST = ipi52
+    then
+      itens.LCstIpi := 52;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.IPI.CST = ipi53
+    then
+      itens.LCstIpi := 53;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.IPI.CST = ipi54
+    then
+      itens.LCstIpi := 54;
+    if ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.IPI.CST = ipi55
+    then
+      itens.LCstIpi := 55;
+
+    // Itens.LClenq:= ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.IPI.clEnq;
+    itens.LCnpjProd := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.IPI.CNPJProd;
+    // Itens.LCSelo:= ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.IPI.cSelo;
+    itens.LQSelo := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.IPI.qSelo;
+    itens.LVbcIpi := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.IPI.vBC;
+    itens.LQUnid := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.IPI.qUnid;
+    itens.LVUnid := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.IPI.vUnid;
+    itens.LPipi := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.IPI.pIPI;
+    itens.LVIpi := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.IPI.vIPI;
+    // Retido
+    itens.LVFcpStret := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.vFCPSTRet;
+    itens.LVIcmsStret := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.vICMSSTRet;
+    itens.LVBcStret := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.vBCSTRet;
+    itens.LVBcfcpStret := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.vBCFCPSTRet;
+    // ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i].Imposto.ICMS.vICMSSubstituto;
+    itens.LPSt := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.pST;
+    itens.LPFcpStret := ACBrNFe.NotasFiscais.Items[0].NFe.Det.Items[i]
+      .Imposto.ICMS.pFCPSTRet;
+
+    itens.SalvarItens(itens, IdNotas, Tipo);
+    MemoRetorno.Lines.Add('Item Importado: ' + itens.LXProd);
+  end;
+
+end;
+
+function TFConversor.ImportarNotas(Tipo: string): Boolean;
+var
+  i: Integer;
+  CNPJ, Fisco, Complementar, Chave, terceiros, CNPJDest: string;
+begin
+  Notas.LVIcms := ACBrNFe.NotasFiscais.Items[0].NFe.Total.ICMSTot.vICMS;
+  Notas.LVBc := ACBrNFe.NotasFiscais.Items[0].NFe.Total.ICMSTot.vBC;
+  Notas.LVIcmsdeson := ACBrNFe.NotasFiscais.Items[0]
+    .NFe.Total.ICMSTot.vICMSDeson;
+  Notas.LVSt := ACBrNFe.NotasFiscais.Items[0].NFe.Total.ICMSTot.vST;
+  Notas.LVNf := ACBrNFe.NotasFiscais.Items[0].NFe.Total.ICMSTot.vNF;
+  Notas.LVFcpUfDest := ACBrNFe.NotasFiscais.Items[0]
+    .NFe.Total.ICMSTot.vFCPUFDest;
+  Notas.LVfcp := ACBrNFe.NotasFiscais.Items[0].NFe.Total.ICMSTot.vFCP;
+  Notas.LVBcSt := ACBrNFe.NotasFiscais.Items[0].NFe.Total.ICMSTot.vBCST;
+  Notas.LVFcpSt := ACBrNFe.NotasFiscais.Items[0].NFe.Total.ICMSTot.vFCPST;
+  Notas.LVFcpStret := ACBrNFe.NotasFiscais.Items[0].NFe.Total.ICMSTot.vFCPSTRet;
+  Notas.LVProd := ACBrNFe.NotasFiscais.Items[0].NFe.Total.ICMSTot.vProd;
+  Notas.LVFrete := ACBrNFe.NotasFiscais.Items[0].NFe.Total.ICMSTot.vFrete;
+  Notas.LVSeg := ACBrNFe.NotasFiscais.Items[0].NFe.Total.ICMSTot.vSeg;
+  Notas.LVDesc := ACBrNFe.NotasFiscais.Items[0].NFe.Total.ICMSTot.vDesc;
+  Notas.LVOutro := ACBrNFe.NotasFiscais.Items[0].NFe.Total.ICMSTot.vOutro;
+  Notas.LVpis := ACBrNFe.NotasFiscais.Items[0].NFe.Total.ICMSTot.vPIS;
+  Notas.LVCofins := ACBrNFe.NotasFiscais.Items[0].NFe.Total.ICMSTot.vCOFINS;
+  Notas.LVIpideVol := ACBrNFe.NotasFiscais.Items[0].NFe.Total.ICMSTot.vIPIDevol;
+  Notas.LVIpi := ACBrNFe.NotasFiscais.Items[0].NFe.Total.ICMSTot.vIPI;
+  Notas.LSerie := ACBrNFe.NotasFiscais.Items[0].NFe.Ide.serie;
+  Notas.LNaTop := ACBrNFe.NotasFiscais.Items[0].NFe.Ide.natOp;
+  Notas.LMode := ACBrNFe.NotasFiscais.Items[0].NFe.Ide.modelo;
+  Notas.LNnf := ACBrNFe.NotasFiscais.Items[0].NFe.Ide.nNF;
+  Notas.LCNf := ACBrNFe.NotasFiscais.Items[0].NFe.Ide.cNF;
+  Notas.LDhEmi := ACBrNFe.NotasFiscais.Items[0].NFe.Ide.dEmi;
+  Notas.LDhSaiEnt := ACBrNFe.NotasFiscais.Items[0].NFe.Ide.dSaiEnt;
+  Fisco := ACBrNFe.NotasFiscais.Items[0].NFe.InfAdic.infAdFisco;
+  Complementar := ACBrNFe.NotasFiscais.Items[0].NFe.InfAdic.infCpl;
+  Chave := Copy(ACBrNFe.NotasFiscais.Items[0].NFe.infNFe.ID, 4, 100);
+
+  if (ACBrNFe.NotasFiscais.Items[0].NFe.Ide.tpNF = tnEntrada) then
+    Notas.LTpNf := 0
+  else
+    Notas.LTpNf := 1;
+
+  if ACBrNFe.NotasFiscais.Items[0].NFe.Ide.tpEmis = teNormal then
+    Notas.LTpEmis := 0;
+  if ACBrNFe.NotasFiscais.Items[0].NFe.Ide.tpEmis = teContingencia then
+    Notas.LTpEmis := 1;
+
+  if ACBrNFe.NotasFiscais.Items[0].NFe.Ide.finNFe = fnNormal then
+    Notas.LFinNfe := 0;
+  if ACBrNFe.NotasFiscais.Items[0].NFe.Ide.finNFe = fnComplementar then
+    Notas.LFinNfe := 1;
+  if ACBrNFe.NotasFiscais.Items[0].NFe.Ide.finNFe = fnAjuste then
+    Notas.LFinNfe := 2;
+  if ACBrNFe.NotasFiscais.Items[0].NFe.Ide.finNFe = fnDevolucao then
+    Notas.LFinNfe := 3;
+
+  CNPJ := ACBrNFe.NotasFiscais.Items[0].NFe.Emit.CNPJCPF;
+  CNPJDest := ACBrNFe.NotasFiscais.Items[0].NFe.Dest.CNPJCPF;
+
+  try
+    if (Tipo = '55') or (Tipo = '65') then
+    begin
+      terceiros := 'N';
+      Notas.SalvarNotasRepositorio('SAIDAS', Notas, CNPJ, Complementar, Fisco,
+        terceiros, CNPJDest, Tipo, Chave);
+    end;
+    if Tipo = 'Terceiros' then
+    begin
+      terceiros := 'S';
+      Notas.SalvarNotasRepositorio('ENTRADAS', Notas, CNPJ, Complementar, Fisco,
+        terceiros, CNPJDest, Tipo, Chave);
+    end;
+    MemoRetorno.Lines.Add('Nota importada: ' + Chave);
+
+  except
+    on Erro: Exception do
+      ShowMessage('Erro: ' + Erro.message);
+
+  end;
+end;
+
+procedure TFConversor.ListarArquivos(diretorio, Tipo: string);
+var
+  F: TSearchRec;
+  Ret: Integer;
+  Tempnome: string;
+
+begin
+  Ret := FindFirst(diretorio + '\*.*', faAnyFile, F);
+  try
+    while Ret = 0 do
+    begin
+      if (F.Name <> '.') And (F.Name <> '..') then
+      begin
+
+        Memo55.Lines.Add(diretorio + '\' + F.Name);
+
+      end;
+      Ret := FindNext(F);
+    end;
+
+  finally
+    FindClose(F);
+  end;
+end;
+
+procedure TFConversor.ListarXml(Tipo: string);
+begin
+
+  if Tipo = '55' then
+  begin
+    Memo55.Clear;
+    ListarArquivos(Edt55.text, Tipo);
+  end;
+  if Tipo = '65' then
+  begin
+    Memo55.Clear;
+    ListarArquivos(Edt65.text, Tipo);
+  end;
+  if Tipo = 'Serviço' then
+  begin
+    Memo55.Clear;
+    ListarArquivos(EdtServicos.text, Tipo);
+  end;
+  if Tipo = 'Terceiros' then
+  begin
+    Memo55.Clear;
+    ListarArquivos(EdtTerceiros.text, Tipo);
+  end;
+
+end;
+
+procedure TFConversor.Localiza(Tipo: string);
+begin
+  if Memo55.Lines.Count > 0 then
+    Importar(Memo55.Lines.Count - 1, Tipo)
+  else
+    ShowMessage('Selecione uma pasta e liste os arquivos');
+end;
+
+end.

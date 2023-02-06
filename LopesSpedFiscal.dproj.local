@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2022/09/03 10:53:06.000.574,=C:\Users\CONTR\OneDrive\Documentos\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2022/09/03 10:54:21.000.647,C:\Users\CONTR\OneDrive\Documentos\Embarcadero\Studio\Projects\Unit1.dfm=C:\Projetos\LopesSped\Views\FrmPrincipal.dfm</Transaction>
+    <Transaction>2022/09/03 10:54:21.000.647,C:\Users\CONTR\OneDrive\Documentos\Embarcadero\Studio\Projects\Unit1.pas=C:\Projetos\LopesSped\Views\FrmPrincipal.pas</Transaction>
+    <Transaction>2022/09/03 10:54:40.000.489,C:\Users\CONTR\OneDrive\Documentos\Embarcadero\Studio\Projects\Project1.dproj=C:\Projetos\LopesSped\LopesSpedFiscal.dproj</Transaction>
+    <Transaction>2022/09/03 10:56:16.000.596,=C:\Projetos\LopesSped\Dao\Conexao.pas</Transaction>
+    <Transaction>2022/09/03 11:09:55.000.056,=C:\Projetos\LopesSped\Views\Frm_SPEDFiscal.pas</Transaction>
+    <Transaction>2022/09/03 11:10:05.000.259,=C:\Projetos\LopesSped\Views\Frm_SPEDPisCofins.pas</Transaction>
+    <Transaction>2022/09/03 11:14:18.000.719,=C:\Projetos\LopesSped\Unit1.pas</Transaction>
+    <Transaction>2022/09/03 11:15:00.000.590,C:\Projetos\LopesSped\Unit1.pas=C:\Projetos\LopesSped\Views\Frmconversor.pas</Transaction>
+    <Transaction>2022/09/03 11:15:00.000.590,C:\Projetos\LopesSped\Unit1.dfm=C:\Projetos\LopesSped\Views\Frmconversor.dfm</Transaction>
+    <Transaction>2022/09/03 11:30:38.000.192,C:\Projetos\LopesSped\Views\Frm_SPEDPisCofins.pas=</Transaction>
+    <Transaction>2022/09/03 11:30:38.000.299,C:\Projetos\LopesSped\Views\Frm_SPEDFiscal.pas=</Transaction>
+    <Transaction>2022/09/03 11:31:33.000.488,=C:\Projetos\LopesSped\Views\Frm_SPEDFiscal.pas</Transaction>
+    <Transaction>2022/09/03 11:31:33.000.802,=C:\Projetos\LopesSped\Views\Frm_SPEDPisCofins.pas</Transaction>
+    <Transaction>2022/09/03 11:36:40.000.400,C:\Projetos\LopesSped\Views\Frm_SPEDPisCofins.pas=</Transaction>
+    <Transaction>2022/09/03 11:36:44.000.984,C:\Projetos\LopesSped\Views\Frm_SPEDFiscal.pas=</Transaction>
+    <Transaction>2022/09/03 11:36:54.000.575,=C:\Projetos\LopesSped\Views\Frm_SPEDFiscal.pas</Transaction>
+    <Transaction>2022/09/03 11:38:18.000.685,C:\Projetos\LopesSped\Views\Frm_SPEDFiscal.pas=</Transaction>
+    <Transaction>2022/09/03 11:40:24.000.666,=C:\Projetos\LopesSped\Views\Frm_SPEDFiscal.pas</Transaction>
+    <Transaction>2022/09/03 11:40:30.000.475,=C:\Projetos\LopesSped\Views\Frm_SPEDPisCofins.pas</Transaction>
+    <Transaction>2022/09/06 13:14:05.000.724,=C:\SvnP\Lopessped\Repósitório\Participante.pas</Transaction>
+    <Transaction>2022/09/06 13:14:05.000.743,=C:\SvnP\Lopessped\Repósitório\REntradaRepositorio.pas</Transaction>
+    <Transaction>2022/09/06 15:42:57.000.265,=C:\SvnP\Lopessped\Unit1.pas</Transaction>
+    <Transaction>2022/09/06 15:46:25.000.177,=C:\SvnP\Lopessped\Unit1.pas</Transaction>
+    <Transaction>2022/09/06 15:50:53.000.824,C:\SvnP\Lopessped\Repósitório\RepoParticipanteM.pas=C:\SvnP\Lopessped\Unit1.pas</Transaction>
+    <Transaction>2022/09/06 16:11:33.000.216,C:\SvnP\Lopessped\Repósitório\RepoParticipanteM.pas=</Transaction>
+    <Transaction>2022/09/08 10:20:01.000.849,=C:\SvnP\Lopessped\Unit1.pas</Transaction>
+    <Transaction>2022/09/08 10:23:36.000.148,C:\SvnP\Lopessped\Repósitório\Empresa.pas=C:\SvnP\Lopessped\Unit1.pas</Transaction>
+    <Transaction>2022/09/08 12:40:51.000.874,=C:\SvnP\Lopessped\Unit1.pas</Transaction>
+    <Transaction>2022/09/08 12:42:09.000.139,C:\SvnP\Lopessped\Views\CadastroEmpresaView.dfm=C:\SvnP\Lopessped\Unit1.dfm</Transaction>
+    <Transaction>2022/09/08 12:42:09.000.139,C:\SvnP\Lopessped\Views\CadastroEmpresaView.pas=C:\SvnP\Lopessped\Unit1.pas</Transaction>
+    <Transaction>2022/09/08 17:39:19.000.472,=C:\SvnP\Lopessped\Repósitório\Contador.pas</Transaction>
+    <Transaction>2022/09/13 13:52:06.000.812,=C:\SvnP\Lopessped\Repósitório\itens.pas</Transaction>
+    <Transaction>2022/10/10 11:27:09.000.410,C:\SvnP\Lopessped\Views\Frm_SPEDFiscal.pas=</Transaction>
+    <Transaction>2022/10/10 11:27:09.000.377,C:\SvnP\Lopessped\Views\Frm_SPEDPisCofins.pas=</Transaction>
+    <Transaction>2022/10/10 11:27:26.000.448,=C:\SvnP\Lopessped\Views\Frm_SPEDPisCofins.pas</Transaction>
+    <Transaction>2022/10/10 11:27:26.000.251,=C:\SvnP\Lopessped\Views\Frm_SPEDFiscal.pas</Transaction>
+    <Transaction>2022/10/10 13:45:36.000.580,=C:\SvnP\Lopessped\Views\CadastroDeContador.pas</Transaction>
+    <Transaction>2022/10/18 10:48:37.000.856,=C:\SvnP\Lopessped\Views\FrmPesquisa.pas</Transaction>
+    <Transaction>2022/10/18 10:48:37.000.790,=C:\SvnP\Lopessped\Views\FrmContasContabeis.pas</Transaction>
+    <Transaction>2022/10/18 10:51:12.000.505,=C:\SvnP\Lopessped\Repósitório\Contascontabeis.pas</Transaction>
+    <Transaction>2022/10/18 10:56:33.000.830,=C:\SvnP\Lopessped\Unit1.pas</Transaction>
+    <Transaction>2022/10/18 10:59:04.000.450,C:\SvnP\Lopessped\Unit1.pas=C:\SvnP\Lopessped\Repósitório\CentroDecustos.pas</Transaction>
+    <Transaction>2022/10/18 11:56:09.000.367,=C:\SvnP\Lopessped\Unit1.pas</Transaction>
+    <Transaction>2022/10/18 11:57:05.000.597,C:\SvnP\Lopessped\Unit1.dfm=C:\SvnP\Lopessped\Views\FrmCadCentroDecusto.dfm</Transaction>
+    <Transaction>2022/10/18 11:57:05.000.597,C:\SvnP\Lopessped\Unit1.pas=C:\SvnP\Lopessped\Views\FrmCadCentroDecusto.pas</Transaction>
+    <Transaction>2022/10/18 14:39:38.000.574,=C:\SvnP\Lopessped\Unit1.pas</Transaction>
+    <Transaction>2022/10/18 14:43:18.000.793,C:\SvnP\Lopessped\Repósitório\Bens.pas=C:\SvnP\Lopessped\Unit1.pas</Transaction>
+    <Transaction>2022/10/18 15:36:12.000.445,=C:\SvnP\Lopessped\Unit1.pas</Transaction>
+    <Transaction>2022/10/18 15:36:37.000.657,C:\SvnP\Lopessped\Views\FrmCadBens.pas=C:\SvnP\Lopessped\Unit1.pas</Transaction>
+    <Transaction>2022/10/18 15:36:37.000.657,C:\SvnP\Lopessped\Views\FrmCadBens.dfm=C:\SvnP\Lopessped\Unit1.dfm</Transaction>
+  </Transactions>
+</BorlandProject>

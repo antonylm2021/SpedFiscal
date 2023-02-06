@@ -1,0 +1,44 @@
+object CadCentroDecusto: TCadCentroDecusto
+  Left = 0
+  Top = 0
+  Caption = 'Centro de custos'
+  ClientHeight = 146
+  ClientWidth = 535
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  PixelsPerInch = 96
+  TextHeight = 13
+  object LblId: TLabeledEdit
+    Left = 24
+    Top = 24
+    Width = 121
+    Height = 21
+    EditLabel.Width = 33
+    EditLabel.Height = 13
+    EditLabel.Caption = 'C'#243'digo'
+    TabOrder = 0
+  end
+  object nome: TLabeledEdit
+    Left = 24
+    Top = 64
+    Width = 489
+    Height = 21
+    EditLabel.Width = 27
+    EditLabel.Height = 13
+    EditLabel.Caption = 'Nome'
+    TabOrder = 1
+  end
+  object Button1: TButton
+    Left = 24
+    Top = 105
+    Width = 75
+    Height = 25
+    Caption = 'Button1'
+    TabOrder = 2
+  end
+end

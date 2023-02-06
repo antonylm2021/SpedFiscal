@@ -1,0 +1,149 @@
+unit FrmContasContabeis;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms,System.StrUtils,FrmPesquisa, Uni,Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,Contascontabeis;
+
+type
+  TFContascontabeis = class(TForm)
+    LblId: TLabeledEdit;
+    LblNome: TLabeledEdit;
+    CboxNaureza: TComboBox;
+    Label1: TLabel;
+    CbIndicador: TComboBox;
+    Label2: TLabel;
+    LblNivel: TLabeledEdit;
+    Button1: TButton;
+    Button2: TButton;
+    Button3: TButton;
+    Button4: TButton;
+    procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
+  private
+    { Private declarations }
+    procedure PassarDados;
+    procedure LimparForm;
+
+
+
+
+  public
+    { Public declarations }
+     procedure LocalizarRegistro(Id:integer);
+  end;
+
+var
+  FContascontabeis: TFContascontabeis;
+  Contas:TContascontabeis;
+  Qry: TUniquery;
+
+
+implementation
+
+{$R *.dfm}
+
+{ TForm1 }
+
+procedure TFContascontabeis.Button1Click(Sender: TObject);
+begin
+  PassarDados();
+  LimparForm();
+end;
+
+procedure TFContascontabeis.Button2Click(Sender: TObject);
+begin
+  if LblId.Text <> '' then
+    begin
+      Contas:= TContascontabeis.Create();
+      Contas.ExcluirContasContabeis(StrToInt(LblId.text));
+      LimparForm();
+    end;
+end;
+
+procedure TFContascontabeis.Button3Click(Sender: TObject);
+begin
+  FPesquisa:= TFPesquisa.Create(self);
+  FPesquisa.TipoDePesquisa('Contas');
+  FPesquisa.Free;
+end;
+
+procedure TFContascontabeis.Button4Click(Sender: TObject);
+begin
+  LimparForm();
+end;
+
+procedure TFContascontabeis.LimparForm;
+begin
+  lblNome.text:='';
+  lblnivel.text:='';
+  lblid.text:='';
+  CboxNaureza.ItemIndex:=0;
+  CbIndicador.ItemIndex:=0;
+end;
+
+procedure TFContascontabeis.LocalizarRegistro(Id:Integer);
+begin
+  Contas := TContascontabeis.Create();
+  Qry:= TUniQuery.Create(nil);
+  Qry:= Contas.ListarPorId(id);
+  try
+  if Not Qry.IsEmpty then
+    begin
+      lblNome.text:= Qry.FieldByName('NOME_CTA').AsString;
+      lblnivel.text:= Qry.FieldByName('NIVEL').AsString;
+      lblid.text:= IntToStr(Qry.FieldByName('ID').Asinteger);
+
+      case AnsiIndexStr(Qry.FieldByName('COD_NAT_CC').Asstring, ['01','02','03','04','05','09']) of
+        0: CboxNaureza.ItemIndex := 0;
+        1: CboxNaureza.ItemIndex := 1;
+        2: CboxNaureza.ItemIndex := 2;
+        3: CboxNaureza.ItemIndex := 3;
+        4: CboxNaureza.ItemIndex := 4;
+        5: CboxNaureza.ItemIndex := 5;
+      end;
+
+        case AnsiIndexStr(Qry.FieldByName('IND_CTA').Asstring,['S','A']) of
+        0: CbIndicador.ItemIndex:=0;
+        1: CbIndicador.ItemIndex:=1;
+      end;
+
+    end;
+  finally
+    Contas.Free;
+    Qry.Free;
+
+  end;
+
+end;
+
+procedure TFContascontabeis.PassarDados;
+var
+id:integer;
+begin
+  Contas:= TContascontabeis.Create();
+
+  Contas.Nome_Cta:=lblNome.text;
+  Contas.Nivel:=lblnivel.text;
+  Contas.Cod_NAT_CC:=Copy(CboxNaureza.Text,0,3);
+  Contas.Ind_Cta:=Copy(CbIndicador.Text,0,1);
+    try
+    if LblId.Text = '' then
+       Contas.SalvarContasContabeis(Contas)
+     else
+      begin
+      id:= StrToInt(LblId.text);
+       Contas.EditarContascontabeis(Contas,Id);
+      end;
+    finally
+      Contas.Free;
+    end;
+
+end;
+
+
+
+end.

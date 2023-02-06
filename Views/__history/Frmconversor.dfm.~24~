@@ -1,0 +1,181 @@
+object FConversor: TFConversor
+  Left = 0
+  Top = 0
+  Caption = 'Conversor Xml'
+  ClientHeight = 618
+  ClientWidth = 698
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poScreenCenter
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Label1: TLabel
+    Left = 8
+    Top = 171
+    Width = 51
+    Height = 13
+    Caption = 'Xmls Pasta'
+  end
+  object Edt55: TLabeledEdit
+    Left = 8
+    Top = 24
+    Width = 521
+    Height = 21
+    EditLabel.Width = 108
+    EditLabel.Height = 13
+    EditLabel.Caption = 'Pasta NF-e Modelo  55'
+    TabOrder = 0
+  end
+  object Edt65: TLabeledEdit
+    Left = 8
+    Top = 64
+    Width = 521
+    Height = 21
+    EditLabel.Width = 115
+    EditLabel.Height = 13
+    EditLabel.Caption = 'Pasta NFC-e Modelo  65'
+    TabOrder = 1
+  end
+  object EdtTerceiros: TLabeledEdit
+    Left = 8
+    Top = 104
+    Width = 521
+    Height = 21
+    EditLabel.Width = 170
+    EditLabel.Height = 13
+    EditLabel.Caption = 'Pasta NF-e  Recebidas de Terceiros'
+    TabOrder = 2
+  end
+  object EdtServicos: TLabeledEdit
+    Left = 8
+    Top = 144
+    Width = 521
+    Height = 21
+    EditLabel.Width = 113
+    EditLabel.Height = 13
+    EditLabel.Caption = 'Pasta NFS-e  (Servi'#231'os)'
+    TabOrder = 3
+  end
+  object Button1: TButton
+    Left = 535
+    Top = 22
+    Width = 75
+    Height = 25
+    Caption = 'Localizar'
+    TabOrder = 4
+    OnClick = Button1Click
+  end
+  object Button2: TButton
+    Left = 535
+    Top = 62
+    Width = 75
+    Height = 25
+    Caption = 'Localizar'
+    TabOrder = 5
+    OnClick = Button2Click
+  end
+  object Button3: TButton
+    Left = 535
+    Top = 102
+    Width = 75
+    Height = 25
+    Caption = 'Localizar'
+    TabOrder = 6
+    OnClick = Button3Click
+  end
+  object Button4: TButton
+    Left = 535
+    Top = 142
+    Width = 75
+    Height = 25
+    Caption = 'Localizar'
+    TabOrder = 7
+    OnClick = Button4Click
+  end
+  object Btn55: TButton
+    Left = 616
+    Top = 22
+    Width = 75
+    Height = 25
+    Caption = 'Importar'
+    TabOrder = 8
+    OnClick = Btn55Click
+  end
+  object Btn65: TButton
+    Left = 616
+    Top = 62
+    Width = 75
+    Height = 25
+    Caption = 'Importar'
+    TabOrder = 9
+    OnClick = Btn65Click
+  end
+  object Btnterceiros: TButton
+    Left = 616
+    Top = 102
+    Width = 75
+    Height = 25
+    Caption = 'Importar'
+    TabOrder = 10
+    OnClick = BtnterceirosClick
+  end
+  object BtnServicos: TButton
+    Left = 616
+    Top = 142
+    Width = 75
+    Height = 25
+    Caption = 'Importar'
+    TabOrder = 11
+    OnClick = BtnServicosClick
+  end
+  object Memo55: TMemo
+    Left = 8
+    Top = 190
+    Width = 682
+    Height = 171
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 12
+  end
+  object MemoRetorno: TMemo
+    Left = 8
+    Top = 384
+    Width = 682
+    Height = 209
+    TabOrder = 13
+  end
+  object ProgressBar1: TProgressBar
+    Left = 8
+    Top = 599
+    Width = 682
+    Height = 17
+    TabOrder = 14
+  end
+  object OpenDialog1: TOpenDialog
+    Left = 696
+    Top = 40
+  end
+  object AcbrNFe: TACBrNFe
+    Configuracoes.Geral.SSLLib = libNone
+    Configuracoes.Geral.SSLCryptLib = cryNone
+    Configuracoes.Geral.SSLHttpLib = httpNone
+    Configuracoes.Geral.SSLXmlSignLib = xsNone
+    Configuracoes.Geral.FormatoAlerta = 'TAG:%TAGNIVEL% ID:%ID%/%TAG%(%DESCRICAO%) - %MSG%.'
+    Configuracoes.Arquivos.OrdenacaoPath = <>
+    Configuracoes.WebServices.UF = 'SP'
+    Configuracoes.WebServices.AguardarConsultaRet = 0
+    Configuracoes.WebServices.QuebradeLinha = '|'
+    Configuracoes.RespTec.IdCSRT = 0
+    Left = 640
+    Top = 208
+  end
+end

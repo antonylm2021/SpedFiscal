@@ -1,0 +1,391 @@
+unit Participante;
+
+interface
+
+uses Conexao, uni, System.SysUtils, classes, Vcl.Dialogs;
+
+type
+  TParticipante = class
+
+  private
+    Id: Integer;
+    CNPJ: string;
+    XNome: string;
+    Xlgr: string;
+    Nro: Integer;
+    Xcpl: string;
+    xBairro: string;
+    CMun: Integer;
+    Xmun: string;
+    Uf: string;
+    Cep: string;
+    cPais: Integer;
+    Fone: string;
+    Indedest: string;
+    Ie: string;
+    Email: string;
+    XPais: string;
+    Data: TDate;
+    function GetId: Integer;
+    procedure SetId(const Value: Integer);
+    function GetCNPJ: string;
+    function GetNro: Integer;
+    function GetXCpl: string;
+    function GetXLgr: string;
+    function GetXNome: string;
+    function GetXNum: string;
+    procedure SetcMun(const Value: Integer);
+    procedure SetCNPj(const Value: string);
+    procedure SetNro(const Value: Integer);
+    procedure SetXcpl(const Value: string);
+    procedure SetXLgr(const Value: string);
+    procedure SetXnome(const Value: string);
+    procedure SetxNum(const Value: string);
+    function GetCMun: Integer;
+    function GetCep: string;
+    function GetCPais: Integer;
+    function GetData: TDateTime;
+    procedure Getemail(const Value: string);
+    function Getfone: string;
+    function GetindDest: string;
+    function GetUf: string;
+    function GetxPais: string;
+    procedure SetCep(const Value: string);
+    procedure SetCPais(const Value: Integer);
+    procedure SetData(const Value: TDateTime);
+    function SetEmail: string;
+    procedure SetFone(const Value: string);
+    procedure SetIe(const Value: string);
+    procedure SetInddest(const Value: string);
+    procedure SetUf(const Value: string);
+    procedure SetXpais(const Value: string);
+    function GetIe: string;
+    function GetXBairro: string;
+    procedure SetXBairro(const Value: string);
+
+  var
+    conect: tconexao;
+    Qry: Tuniquery;
+  public
+
+    property LId: Integer read GetId write SetId;
+    property LCNPJ: string read GetCNPJ write SetCNPj;
+    property LXnome: string read GetXNome write SetXnome;
+    property LXlgr: string read GetXLgr write SetXLgr;
+    property LNro: Integer read GetNro write SetNro;
+    property LXcpl: string read GetXCpl write SetXcpl;
+    property LXBairro: string read GetXBairro write SetXBairro;
+    property LCMun: Integer read GetCMun write SetcMun;
+    property LXnum: string read GetXNum write SetxNum;
+    property LUf: string read GetUf write SetUf;
+    property LCep: string read GetCep write SetCep;
+    property LcPais: Integer read GetCPais write SetCPais;
+    property LXPais: string read GetxPais write SetXpais;
+    property LFone: string read Getfone write SetFone;
+    property LIndDest: string read GetindDest write SetInddest;
+    property LIe: string read GetIe write SetIe;
+    property LEmail: string read SetEmail write Getemail;
+    property LData: TDateTime read GetData write SetData;
+    constructor create;
+    function SalvarParticipante(const Participante: TParticipante): boolean;
+    function ListarParticipantesPorPeriodo: Tuniquery;
+    function VerificarSeExiste(CNPJ:string):Boolean;
+    destructor Destroy;
+    function LocalizarParticipantePorCNPJ(CNPJ:string):string;
+    function LocalizarCodigoDoParticipantePorCnpj(CNPJ:string):TUniQuery;
+  end;
+
+implementation
+
+{ TParticipante }
+
+constructor TParticipante.create;
+begin
+  conect := tconexao.create('Local');
+  Qry := Tuniquery.create(nil);
+  Qry.Connection := conect.Conexao;
+end;
+
+destructor TParticipante.Destroy;
+begin
+  conect.Free;
+  Qry.Free;
+end;
+
+function TParticipante.GetCep: string;
+begin
+  Result := Cep;
+end;
+
+function TParticipante.GetCMun: Integer;
+begin
+  Result := CMun;
+end;
+
+function TParticipante.GetCNPJ: string;
+begin
+  Result := CNPJ;
+end;
+
+function TParticipante.GetCPais: Integer;
+begin
+  Result := cPais;
+end;
+
+function TParticipante.GetData: TDateTime;
+begin
+  Result := Data;
+end;
+
+procedure TParticipante.Getemail(const Value: string);
+begin
+  Email := Value;
+end;
+
+function TParticipante.Getfone: string;
+begin
+  Result := Fone;
+end;
+
+function TParticipante.GetId: Integer;
+begin
+  Result := Id;
+end;
+
+function TParticipante.GetIe: string;
+begin
+  Result := Ie;
+end;
+
+function TParticipante.GetindDest: string;
+begin
+  Result := Indedest;
+end;
+
+function TParticipante.GetNro: Integer;
+begin
+  Result := Nro;
+end;
+
+function TParticipante.GetUf: string;
+begin
+  Result := Uf;
+end;
+
+function TParticipante.GetXBairro: string;
+begin
+  Result:= xBairro;
+end;
+
+function TParticipante.GetXCpl: string;
+begin
+  Result := Xcpl;
+end;
+
+function TParticipante.GetXLgr: string;
+begin
+  Result := Xlgr;
+end;
+
+function TParticipante.GetXNome: string;
+begin
+  Result := XNome;
+end;
+
+function TParticipante.GetXNum: string;
+begin
+  Result := Xmun;
+end;
+
+function TParticipante.GetxPais: string;
+begin
+  Result := XPais;
+end;
+
+function TParticipante.ListarParticipantesPorPeriodo()
+  : Tuniquery;
+begin
+  Qry.SQL.Add('SELECT * FROM PARTICIPANTES');
+  Qry.Open;
+
+  if Not Qry.IsEmpty then
+    Result := Qry
+  else
+
+end;
+
+function TParticipante.LocalizarCodigoDoParticipantePorCnpj(
+  CNPJ: string): TUniQuery;
+begin
+  Qry.SQL.Clear;
+  Qry.SQL.Add('SELECT ID FROM PARTICIPANTES WHERE CNPJ = :PCNPJ ');
+  Qry.Params.ParamByName('PCNPJ').AsString:= CNPJ;
+  try
+    Qry.Open;
+    Result:= Qry.FieldByName('ID').AsInteger;
+  except
+    on Erro: Exception do
+    ShowMessage('Erro: '+Erro.Message);
+
+  end;
+end;
+
+function TParticipante.LocalizarParticipantePorCNPJ(CNPJ: string): string;
+begin
+  Qry.SQL.Clear;
+  Qry.SQL.Add('SELECT XNOME FROM PARTICIPANTES WHERE CNPJ = :PCNPJ ');
+  Qry.Params.ParamByName('PCNPJ').AsString:= CNPJ;
+  try
+    Qry.Open;
+    Result:= Qry.FieldByName('XNOME').AsString;
+  except
+    on Erro: Exception do
+    ShowMessage('Erro: '+Erro.Message);
+
+  end;
+end;
+
+function TParticipante.SalvarParticipante(const Participante
+  : TParticipante): boolean;
+begin
+  
+  if VerificarSeExiste(Participante.CNPJ)= False then
+    begin
+      Qry.SQL.Clear;
+      Qry.SQL.Add
+      ('INSERT INTO PARTICIPANTES (CNPJ,XNOME,XLGR,NRO,XCPL,XBAIRRO,CMUN,XMUN,');
+      Qry.SQL.Add('UF,CEP,CPAIS,XPAIS,FONE,INDIEDEST,IE,EMAIL,DATA)');
+      Qry.SQL.Add
+      ('VALUES(:pCNPJ,:pXNOME,:pXLGR,:pNRO,:pXCPL,:pXBAIRRO,:pCMUN,:pXMUN,:pUF,');
+       Qry.SQL.Add(':pCEP,:pCPAIS,:pXPAIS,:pFONE,:pINDIEDEST,:pIE,:pEMAIL,:pDATA)');
+       Qry.Params.ParamByName('pCNPJ').AsString := Participante.CNPJ;
+       Qry.Params.ParamByName('pXNOME').AsString := Participante.XNome;
+       Qry.Params.ParamByName('pXLGR').AsString := Participante.Xlgr;
+       Qry.Params.ParamByName('pNRO').AsInteger := Participante.Nro;
+       Qry.Params.ParamByName('pXCPL').AsString := Participante.Xcpl;
+       Qry.Params.ParamByName('pXBAIRRO').AsString := Participante.xBairro;
+       Qry.Params.ParamByName('pCMUN').AsInteger := Participante.CMun;
+       Qry.Params.ParamByName('pXMUN').AsString := Participante.Xmun;
+       Qry.Params.ParamByName('pUF').AsString := Participante.Uf;
+       Qry.Params.ParamByName('pCEP').AsString := Participante.Cep;
+       Qry.Params.ParamByName('pCPAIS').AsInteger := Participante.cPais;
+       Qry.Params.ParamByName('pXPAIS').AsString := Participante.XPais;
+       Qry.Params.ParamByName('pFONE').AsString := Participante.Fone;
+       Qry.Params.ParamByName('pINDIEDEST').AsString := Participante.Indedest;
+       Qry.Params.ParamByName('pIE').AsString := Participante.Ie;
+       Qry.Params.ParamByName('pEMAIL').AsString := Participante.Email;
+       Qry.Params.ParamByName('pDATA').AsDate := Participante.Data;
+       try
+         Qry.Execute;
+         Result := True;
+       finally
+       
+       end;
+    end;
+end;
+
+procedure TParticipante.SetCep(const Value: string);
+begin
+  Cep := Value;
+end;
+
+procedure TParticipante.SetcMun(const Value: Integer);
+begin
+  CMun := Value;
+end;
+
+procedure TParticipante.SetCNPj(const Value: string);
+begin
+  CNPJ := Value;
+end;
+
+procedure TParticipante.SetCPais(const Value: Integer);
+begin
+  cPais := Value;
+end;
+
+procedure TParticipante.SetData(const Value: TDateTime);
+begin
+  Data := Value;
+end;
+
+function TParticipante.SetEmail: string;
+begin
+  Result := Email;
+end;
+
+procedure TParticipante.SetFone(const Value: string);
+begin
+  Fone := Value;
+end;
+
+procedure TParticipante.SetId(const Value: Integer);
+begin
+  Id := Value;
+end;
+
+procedure TParticipante.SetIe(const Value: string);
+begin
+  Ie := Value;
+end;
+
+procedure TParticipante.SetInddest(const Value: string);
+begin
+  Indedest := Value;
+end;
+
+procedure TParticipante.SetNro(const Value: Integer);
+begin
+  Nro := Value;
+end;
+
+procedure TParticipante.SetUf(const Value: string);
+begin
+  Uf := Value;
+end;
+
+procedure TParticipante.SetXBairro(const Value: string);
+begin
+  xBairro:= Value;
+end;
+
+procedure TParticipante.SetXcpl(const Value: string);
+begin
+  Xcpl := Value;
+end;
+
+procedure TParticipante.SetXLgr(const Value: string);
+begin
+  Xlgr := Value;
+end;
+
+procedure TParticipante.SetXnome(const Value: string);
+begin
+  XNome := Value;
+end;
+
+procedure TParticipante.SetxNum(const Value: string);
+begin
+  Xmun := Value;
+end;
+
+procedure TParticipante.SetXpais(const Value: string);
+begin
+  XPais := Value;
+end;
+
+function TParticipante.VerificarSeExiste(CNPJ: string): Boolean;
+begin
+  Qry.SQL.Clear;
+  Qry.SQL.Add('SELECT * FROM PARTICIPANTES');
+  Qry.SQL.Add('WHERE CNPJ =:pCnpj');
+  Qry.Params.ParamByName('pCnpj').AsString:= CNPJ;
+  Qry.Open;
+  
+  if not Qry.IsEmpty then
+    Result:= True
+    else
+    Result:= False;
+end;
+
+end.
